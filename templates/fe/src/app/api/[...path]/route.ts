@@ -1,12 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { CORE_API_URL, getApiUrl } from "@/lib/constant";
 
-const MODULE_PREFIXES: Record<string, string> = {
-  tf: getApiUrl("tf"),
-  cam: getApiUrl("cam"),
-  etr: getApiUrl("etr"),
-  notification: getApiUrl("notification"),
-};
+// Microservice / module prefix routing (extend if backend is split into multiple services)
+const MODULE_PREFIXES: Record<string, string> = {};
 
 function normalizeLocale(locale: unknown) {
   if (typeof locale !== "string") return undefined;
@@ -91,7 +87,7 @@ async function handler(
 
   if (accessToken) forwardedHeaders.set("authorization", `Bearer ${accessToken}`);
   if (visitorId) forwardedHeaders.set("x-user-identifier", visitorId);
-  if (locale) forwardedHeaders.set("x-mep-lang", locale);
+  if (locale) forwardedHeaders.set("x-lang", locale);
   if (contentType) forwardedHeaders.set("content-type", contentType);
 
   const isBodyless = ["GET", "HEAD"].includes(req.method.toUpperCase());

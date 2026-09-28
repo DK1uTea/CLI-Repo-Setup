@@ -17,7 +17,7 @@
 
 ## 1. Controller structure
 
-Controllers live in `apps/protrack-backend-api/src/modules/<feature>/<feature>.controller.ts`.
+Controllers live in `apps/{{sanitizedProjectName}}/src/modules/<feature>/<feature>.controller.ts`.
 They contain **zero business logic** — only input extraction, service delegation, and
 response shaping via decorators.
 

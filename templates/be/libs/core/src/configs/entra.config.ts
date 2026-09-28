@@ -11,17 +11,17 @@ export const entraSchema = {
     .default('https://login.microsoftonline.com/common/discovery/v2.0/keys'),
   // JSON array mapping an Entra tenant id (tid) → internal app tenantId. Doubles as the
   // allowlist: only Microsoft tenants listed here may sign in.
-  // Example: [{"tid":"<prowerb-tid>","tenantId":"prowerb"},{"tid":"<ccep-tid>","tenantId":"coca-cola"}]
+  // Example: [{"tid":"<tenant-a-tid>","tenantId":"tenant-a"}]
   ENTRA_TENANT_MAPPINGS: Joi.string().allow('').default(''),
   // Comma-separated email domains whose new SSO users are auto-approved (skip the PENDING
-  // gate). Everyone else still requires manual admin approval. Example: "prowerb.de,ccep.com"
+  // gate). Everyone else still requires manual admin approval. Example: "company.com,partner.org"
   ENTRA_AUTO_APPROVE_DOMAINS: Joi.string().allow('').default(''),
 };
 
 export interface EntraTenantMapping {
   /** Microsoft Entra tenant id (the `tid` claim). */
   tid: string;
-  /** Internal Protrack tenant id this Entra tenant maps to. */
+  /** Internal tenant id this Entra tenant maps to. */
   tenantId: string;
 }
 

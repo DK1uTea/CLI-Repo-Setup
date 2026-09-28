@@ -37,29 +37,18 @@ Template Backend REST API chuẩn doanh nghiệp, xây dựng theo kiến trúc 
 Project dùng **NestJS Monorepo** với 2 apps và 3 libs chia sẻ:
 
 ```
-protrack-backend-api/
+{{sanitizedProjectName}}/
 ├── apps/
-│   ├── protrack-backend-api/          # REST API app (main)
+│   ├── {{sanitizedProjectName}}/          # REST API app (main)
 │   │   ├── src/
 │   │   │   ├── main.ts                # Bootstrap: Swagger, global pipes, CORS
 │   │   │   ├── app.module.ts          # Root module, global guards/interceptors/filters
 │   │   │   └── modules/              # Feature modules (mỗi domain = 1 module)
-│   │   │       ├── auth/             # Login, refresh token, logout, JWT strategy
-│   │   │       ├── devices/          # Device registry CRUD
-│   │   │       ├── positions/        # GPS position history + live map
-│   │   │       ├── events/           # Alert/geofence events
-│   │   │       ├── settings/         # Cấu hình per-tenant
-│   │   │       ├── tenants/          # Tenant management (SUPER_ADMIN only)
-│   │   │       ├── analytics/        # Ingestion pipeline metrics (SUPER_ADMIN only)
-│   │   │       └── index.ts          # Re-export tất cả modules
+│   │   │       ├── auth/             # Login, refresh token, logout
+│   │   │       ├── users/            # Users, admin user management
+│   │   │       ├── tenants/          # Tenant management (SUPER_ADMIN)
+│   │   │       └── index.ts          # Re-export all modules
 │   │   └── tsconfig.app.json
-│   └── tcp-server/                   # TCP ingestion server (GT06/CANTRACK)
-│       ├── src/
-│       │   ├── main.ts
-│       │   ├── tcp-server.module.ts
-│       │   ├── tcp-server.controller.ts
-│       │   └── tcp-server.service.ts
-│       └── tsconfig.app.json
 ├── libs/
 │   ├── core/                         # Shared NestJS building blocks (alias: @app/core)
 │   │   └── src/
@@ -169,15 +158,8 @@ CREATE UNIQUE INDEX "uq_pt_settings_tenant_key" ON "pt_settings"("tenant_id", "k
 
 ```typescript
 UserRole:                 SUPER_ADMIN | ADMIN | USER
-DeviceProtocol:           GT06 | CANTRACK
-DeviceRegistrationStatus: PENDING_ACTIVATION | WHITELISTED | SUSPENDED
-EventType:                ENTERED_GEOFENCE | EXITED_GEOFENCE | DEVICE_ONLINE |
-                          DEVICE_OFFLINE | LOW_BATTERY | OVERSPEED | VIBRATION |
-                          REMOVAL | CUSTOM
-DeviceCommandType:        REBOOT | SET_APN | SET_REPORT_INTERVAL | CUSTOM
-DeviceCommandStatus:      PENDING | SENT | ACKED | FAILED | TIMEOUT | CANCELLED
-DeviceCommandStage:       QUEUED | SENT | ACKED | FAILED | RETRY | TIMEOUT | CANCELLED
-GeofenceType:             CIRCLE | POLYGON
+AuthProvider:             LOCAL | ENTRA
+UserApprovalStatus:       PENDING | APPROVED | REJECTED
 GeofenceAssignmentTargetType: DEVICE | TENANT_ALL
 ```
 
@@ -300,7 +282,7 @@ Sau đó export từ `libs/layer-data/src/index.ts`.
 Feature module **không còn chứa** `interfaces/` hay `repositories/`. Cấu trúc gọn hơn:
 
 ```
-apps/protrack-backend-api/src/modules/my-feature/
+apps/{{sanitizedProjectName}}/src/modules/my-feature/
 ├── my-feature.module.ts         # imports [MyDomainDataModule]
 ├── my-feature.controller.ts
 ├── my-feature.service.ts        # @Inject(MY_DOMAIN_REPOSITORY)
@@ -313,7 +295,7 @@ apps/protrack-backend-api/src/modules/my-feature/
     └── index.ts
 ```
 
-Sau đó export từ `apps/protrack-backend-api/src/modules/index.ts` và import vào `app.module.ts`.
+Sau đó export từ `apps/{{sanitizedProjectName}}/src/modules/index.ts` và import vào `app.module.ts`.
 
 ### Dependency Injection pattern
 
@@ -484,7 +466,7 @@ pnpm dev:api             # REST API app (hot reload)
 pnpm dev:tcp-server      # TCP ingestion server (hot reload)
 
 # Hoặc chạy toàn bộ
-pnpm start:dev           # Build và chạy app mặc định (protrack-backend-api)
+pnpm start:dev           # Build và chạy app mặc định ({{sanitizedProjectName}})
 
 # Database
 docker-compose up -d     # Start TimescaleDB + Redis
@@ -494,7 +476,7 @@ pnpm prisma:generate     # Re-generate Prisma client
 
 # Build
 pnpm build               # Build tất cả apps/libs
-# Prod entry point: dist/apps/protrack-backend-api/main.js
+# Prod entry point: dist/apps/{{sanitizedProjectName}}/main.js
 
 # Test
 pnpm test
@@ -513,7 +495,7 @@ pnpm format              # chỉ format --write
 ```bash
 NODE_ENV=dev
 API_PORT=3000
-DATABASE_URL=postgresql://postgres:<password>@localhost:5432/protrack
+DATABASE_URL=postgresql://postgres:<password>@localhost:5432/{{projectNameDb}}
 JWT_SECRET=<your_jwt_secret>
 JWT_EXPIRES_IN=1d
 
@@ -523,12 +505,12 @@ REDIS_PORT=6379
 
 # Seeding (optional)
 SEED_TENANT_NAME=Default Tenant
-SEED_SUPER_ADMIN_EMAIL=superadmin@protrack.local
+SEED_SUPER_ADMIN_EMAIL=admin@example.com
 SEED_SUPER_ADMIN_NAME=Super Admin
 SEED_SUPER_ADMIN_PASSWORD=<password>
 ```
 
-Docker compose mặc định: `POSTGRES_USER=postgres`, `POSTGRES_DB=protrack`, port `5432`; Redis port `6379`.
+Docker compose mặc định: `POSTGRES_USER=postgres`, `POSTGRES_DB={{projectNameDb}}`, port `5432`; Redis port `6379`.
 
 ---
 
@@ -591,47 +573,3 @@ Types: `feat` | `fix` | `chore` | `docs` | `refactor` | `test` | `perf` | `ci` |
 Swagger: `http://localhost:3000/docs`
 
 ---
-
-## Chưa implement (cần build)
-
-- TCP ingestion server (`apps/tcp-server`) — nhận dữ liệu từ thiết bị GT06/CANTRACK (stub hiện tại)
-- `device-commands` — gửi lệnh xuống thiết bị, retry logic
-- `geofences` — CRUD geofence, assign vào device, geofencing logic
-- `device-status` — dashboard online/offline
-
----
-
-## Domain Knowledge GPS Tracking
-
-### Thiết bị
-- **Protocol GT06:** Binary `0x78 0x78 ...` — Login (0x01), Location (0x12/0x22), Heartbeat (0x13), Alarm (0x16)
-- **Protocol CANTRACK:** ASCII packets — GPS, LBS, heartbeat, command/confirm
-- Lệnh gửi xuống thiết bị qua protocol 0x80 (GT06) hoặc SMS format (CANTRACK)
-
-### Report Frequency
-- Thiết bị trong warehouse: 1–2 lần/ngày
-- Thiết bị ngoài geofence: mỗi 1–5 phút
-- Thay đổi interval cần gửi lệnh `SET_REPORT_INTERVAL` xuống thiết bị
-
-### Geofencing logic
-- Khi nhận position mới → `ST_DWithin(position.geom, geofence.geom, 0)`
-- So sánh với `GeofenceState.is_inside` hiện tại → nếu thay đổi → tạo `Event` (ENTERED/EXITED)
-- Update `GeofenceState.last_position_id` kèm tọa độ thực tế (vì không có FK enforcement)
-
-### Alert types từ GT06 0x16 alarm packet
-- Vibration, Removal (anti-theft), Overspeed
-- Platform-derived alerts: Device offline (lastSeenAt timeout), Geofence enter/exit, Low battery
-
----
-
-## Known Issues & Design Decisions
-
-1. **SUPER_ADMIN phải gắn vào 1 tenant** — cross-tenant access handle ở application layer bằng cách bỏ qua tenant filter khi role = SUPER_ADMIN.
-
-2. **`heading` dùng Int thay vì SmallInt** — technical debt nhỏ, không ảnh hưởng correctness.
-
-3. **`rawPayload` trong `pt_positions`** — lưu raw protocol packet cho debugging; cân nhắc tách ra bảng riêng khi scale.
-
-4. **Lat/Lng duplicate với geom** — `pt_positions` lưu cả `latitude/longitude` (Decimal) và `geom` (geography). Redundant nhưng thuận tiện cho API responses. Đây là quyết định có chủ đích.
-
-5. **Không có `Asset` entity** — hiện tại device = asset. Khi cần swap device, cần thêm `pt_assets` table.

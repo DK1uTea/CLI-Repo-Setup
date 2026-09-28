@@ -45,7 +45,7 @@ src/
 │   │   ├── auth/login/route.ts
 │   │   ├── auth/refresh-token/route.ts
 │   │   ├── clear-cookies/route.ts
-│   │   └── [...path]/route.ts        # Catch-all proxy — forwards any path to core/trade-fair/cam
+│   │   └── [...path]/route.ts        # Catch-all proxy — forwards any path to core/backend-api
 │   ├── [locale]/                     # All UI routes — locale segment is mandatory
 │   │   ├── layout.tsx                # NextIntlClientProvider + ReactQueryProvider + NuqsAdapter
 │   │   ├── (auth)/login/page.tsx     # Public (unauthenticated) routes
@@ -79,7 +79,7 @@ src/
 │   └── stores/                       # Zustand stores
 └── styles/themes/                    # Per-tenant CSS token overrides
     ├── _template.css
-    └── ccep.css
+    └── default.css
 ```
 
 ## Request Lifecycle

@@ -30,7 +30,7 @@ libs/layer-data/src/<domain>/
 ### App feature module (one folder per domain)
 
 ```
-apps/protrack-backend-api/src/modules/<feature>/
+apps/{{sanitizedProjectName}}/src/modules/<feature>/
 ├── <feature>.module.ts            # imports XxxDataModule
 ├── <feature>.controller.ts        # controller — zero business logic
 ├── <feature>.service.ts           # service — business logic + repo calls

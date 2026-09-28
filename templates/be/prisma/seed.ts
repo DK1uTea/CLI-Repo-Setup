@@ -16,9 +16,9 @@ const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 async function main() {
   const tenantName = process.env.SEED_TENANT_NAME ?? 'Default Tenant';
-  const adminEmail = process.env.SEED_SUPER_ADMIN_EMAIL ?? 'admin@protrack.com';
+  const adminEmail = process.env.SEED_SUPER_ADMIN_EMAIL ?? 'admin@example.com';
   const adminName = process.env.SEED_SUPER_ADMIN_NAME ?? 'Super Admin';
-  const adminPassword = process.env.SEED_SUPER_ADMIN_PASSWORD ?? '12345678';
+  const adminPassword = process.env.SEED_SUPER_ADMIN_PASSWORD ?? 'Admin@123456';
   const passwordHash = await bcrypt.hash(adminPassword, 10);
 
   const tenant = await prisma.tenant.upsert({
@@ -30,11 +30,10 @@ async function main() {
     },
   });
 
-  // Tenants used by the Entra SSO tenant mapping (ENTRA_TENANT_MAPPINGS).
-  // Map each Microsoft Entra tenant id (tid) to one of these internal tenant ids.
+  // Example tenant mapping for Entra SSO
   const ssoTenants: Array<{ id: string; name: string }> = [
-    { id: 'prowerb', name: 'Prowerb' },
-    { id: 'coca-cola', name: 'Coca-Cola' },
+    { id: 'tenant-a', name: 'Organization A' },
+    { id: 'tenant-b', name: 'Organization B' },
   ];
   for (const t of ssoTenants) {
     await prisma.tenant.upsert({
@@ -67,14 +66,15 @@ async function main() {
     },
   });
 
-  console.log(`Seeded SUPER_ADMIN user: ${adminEmail}`);
-  console.log(`Seeded SSO tenants: ${ssoTenants.map((t) => t.id).join(', ')}`);
+  console.log('Seed completed successfully!');
+  console.log(`Default tenant: ${tenant.name} (id: ${tenant.id})`);
+  console.log(`Super admin user: ${adminEmail}`);
 }
 
 main()
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+  .catch((e) => {
+    console.error('Seed failed:', e);
+    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();

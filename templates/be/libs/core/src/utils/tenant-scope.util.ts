@@ -25,13 +25,9 @@ export function resolveTenantScope(params: {
  * its own. This is intentionally NOT symmetric and applies to READS only — write paths
  * stay pinned to the caller's own JWT `tenantId` and never consult this map.
  *
- * Pilot decision: all GPS devices are owned by the `coca-cola` (CCEP) customer tenant, and
- * the `prowerb` operator tenant is granted visibility into the CCEP fleet so Prowerb staff
- * and CCEP staff both see the same devices. Extend this map to grant further visibility.
+ * Extend this map to grant multi-tenant read visibility if required by your application.
  */
-export const TENANT_READ_VISIBILITY: Record<string, string[]> = {
-  prowerb: ['prowerb', 'coca-cola'],
-};
+export const TENANT_READ_VISIBILITY: Record<string, string[]> = {};
 
 /**
  * Resolve the tenant scope for READ endpoints, honouring cross-tenant visibility grants.

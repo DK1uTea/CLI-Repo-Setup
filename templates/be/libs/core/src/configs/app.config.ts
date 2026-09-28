@@ -30,9 +30,9 @@ export const getAppConfig = (): IAppConfig => ({
   corsOrigins: process.env.CORS_ORIGINS?.includes(',')
     ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
     : (process.env.CORS_ORIGINS ?? '*'),
-  jwtSecret: process.env.JWT_SECRET ?? 'protrack_dev_secret',
+  jwtSecret: process.env.JWT_SECRET ?? 'dev_jwt_secret_change_in_production',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
-  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET ?? 'protrack_refresh_secret',
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET ?? 'dev_refresh_token_secret_change_in_production',
   refreshTokenTtlDays: Number(process.env.REFRESH_TOKEN_TTL_DAYS ?? 7),
 });
 

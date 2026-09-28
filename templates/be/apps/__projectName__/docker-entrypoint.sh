@@ -49,4 +49,4 @@ fi
 
 echo "[entrypoint] Migrations complete."
 echo "[entrypoint] Starting application..."
-exec node dist/apps/protrack-backend-api/main
+exec node dist/apps/{{sanitizedProjectName}}/main

@@ -2,12 +2,12 @@
 name: engineering-playbook
 version: 1.0.0
 description: >
-  Mandatory engineering playbook for the Protrack Backend API — a NestJS monorepo with
+  Mandatory engineering playbook for the App Backend API — a NestJS monorepo with
   Service/Repository pattern, multi-tenancy, and Prisma ORM. Every agent MUST read and
   strictly follow the conventions in this playbook before writing any line of code —
   including controllers, services, repositories, DTOs, data modules, and Prisma migrations.
   This playbook is the single source of truth for code structure, patterns, and style
-  across all Protrack modules. All DB access MUST go through the @app/layer-data repository
+  across all App modules. All DB access MUST go through the @app/layer-data repository
   interface — never call Prisma directly from a service or controller. Every query that
   touches tenant-owned data MUST enforce tenantId at the repository layer. Errors MUST be
   thrown using Api*HttpError classes with ERROR_CODE constants — never raw string literals.
@@ -15,7 +15,7 @@ description: >
 
 # Engineering Playbook
 
-Mandatory conventions guide for the Protrack Backend API NestJS monorepo.
+Mandatory conventions guide for the App Backend API NestJS monorepo.
 **Read every relevant section before writing any code.**
 
 ## Reference files
@@ -32,7 +32,7 @@ Mandatory conventions guide for the Protrack Backend API NestJS monorepo.
 
 ## Architecture overview
 
-Protrack uses a **NestJS Monorepo** with a strict three-layer architecture:
+App uses a **NestJS Monorepo** with a strict three-layer architecture:
 
 ```
 HTTP Request
@@ -43,12 +43,11 @@ HTTP Request
                                             └─► PrismaService   (@app/third-party, global)
 ```
 
-The monorepo has two apps and three shared libs:
+The monorepo has the main API app and three shared libs:
 
 | Package            | Alias              | Role                                                     |
 | ------------------ | ------------------ | -------------------------------------------------------- |
-| `apps/protrack-backend-api` | —         | REST API (controllers, services, feature modules)        |
-| `apps/tcp-server`  | —                  | TCP ingestion server (GT06 / CANTRACK protocol)          |
+| `apps/{{sanitizedProjectName}}` | —         | REST API (controllers, services, feature modules)        |
 | `libs/core`        | `@app/core`        | Shared decorators, guards, interceptors, filters, types  |
 | `libs/layer-data`  | `@app/layer-data`  | Data access layer — interfaces + Prisma implementations  |
 | `libs/third-party` | `@app/third-party` | PrismaService, CacheService (Redis)                      |

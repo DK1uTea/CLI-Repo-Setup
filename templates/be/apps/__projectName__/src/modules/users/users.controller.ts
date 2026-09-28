@@ -8,7 +8,7 @@ import { ListUsersResponseDto, UserAdminItemResponseDto } from './responses';
 import { UsersService } from './users.service';
 
 /**
- * Admin user management. SUPER_ADMIN only (Prowerb) — cross-tenant.
+ * Admin user management. SUPER_ADMIN only — cross-tenant.
  * Approves / rejects self-registered Entra (SSO) users.
  */
 @ApiTags('Users')

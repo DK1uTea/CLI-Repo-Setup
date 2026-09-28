@@ -17,11 +17,11 @@ function extractHostname(input: string): string {
 
 function matchesDomain(host: string, allowedPattern: string): boolean {
   if (host === allowedPattern) return true;
-  // If allowedPattern has no dot (e.g., 'ccep-qa'), match the first segment of host
+  // If allowedPattern has no dot (e.g., 'tenant-qa'), match the first segment of host
   if (!allowedPattern.includes(".") && host.split(".")[0] === allowedPattern) {
     return true;
   }
-  // Wildcard support (e.g., '*.ccepmep.com')
+  // Wildcard support (e.g., '*.example.com')
   if (allowedPattern.startsWith("*.") && host.endsWith(allowedPattern.slice(1))) {
     return true;
   }

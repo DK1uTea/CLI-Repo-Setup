@@ -115,7 +115,7 @@ export class AuthService {
       });
     }
 
-    // Trusted domains (e.g. prowerb.de, ccep.com) skip the manual approval gate.
+    // Trusted domains (e.g. company.com, partner.org) skip the manual approval gate.
     const approvalStatus = this.microsoftTokenService.isAutoApproveEmail(identity.email)
       ? UserApprovalStatus.APPROVED
       : UserApprovalStatus.PENDING;

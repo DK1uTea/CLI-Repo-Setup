@@ -27,6 +27,6 @@ async function bootstrap() {
   });
   setupSwagger(app);
   await app.listen(apiPort);
-  console.log(`Protrack API is running on port: ${apiPort}`);
+  console.log(`{{projectNameTitle}} API is running on port: ${apiPort}`);
 }
 bootstrap();

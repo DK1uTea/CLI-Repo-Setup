@@ -1,2 +1,0 @@
-ALTER TABLE "pt_users"
-ADD COLUMN "avatar" VARCHAR(500);

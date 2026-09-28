@@ -57,7 +57,7 @@ with the finding differs (full split: `.claude/skills/test-driven-development/SK
 
 MCP is for discovery. **The deliverable is a spec file, and only QA writes it.** An MCP
 session that proved something and left no spec behind proved it only for today — that is an
-acceptable outcome for dev (report it and move on), not for QA.
+abrandtable outcome for dev (report it and move on), not for QA.
 
 ## Setup
 
@@ -181,7 +181,7 @@ between runs.
 cookie jar with the browser context — the real `Set-Cookie` response lands in the context
 before `page.goto()` runs. It is the real login, just not rendered first.
 
-Full doctrine — including the two accepted risks (spending a real login attempt, and
+Full doctrine — including the two abrandted risks (spending a real login attempt, and
 needing dedicated test accounts) — lives in
 `.claude/skills/e2e-module-testing/SKILL.md`.
 

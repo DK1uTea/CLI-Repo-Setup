@@ -6,5 +6,5 @@ model Tenant {
 
   users     User[]
 
-  @@map("pt_tenants")
+  @@map("tenants")
 }

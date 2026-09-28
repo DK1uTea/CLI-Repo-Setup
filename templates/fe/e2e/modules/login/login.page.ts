@@ -12,7 +12,7 @@ import type { Locator, Page } from '@playwright/test';
 export const DE = {
   emailLabel: 'E-Mail',
   passwordLabel: 'Passwort',
-  emailPlaceholder: 'max.mustermann@ccep.com',
+  emailPlaceholder: 'user@example.com',
   passwordPlaceholder: 'Min. 6 Zeichen',
   rememberMe: 'Angemeldet bleiben',
   forgotPassword: 'Passwort vergessen?',

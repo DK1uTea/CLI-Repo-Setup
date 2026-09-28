@@ -92,7 +92,7 @@ async function fetchUserPreferences(req: NextRequest, accessToken?: string): Pro
     const response = await fetch(`${CORE_API_URL}/user/me`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'x-mep-lang': getPathLocale(req.nextUrl.pathname) ?? getPreferredLocale(req),
+        'x-lang': getPathLocale(req.nextUrl.pathname) ?? getPreferredLocale(req),
       },
       cache: 'no-store',
     });

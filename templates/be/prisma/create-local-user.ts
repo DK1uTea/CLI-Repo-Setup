@@ -8,12 +8,12 @@ import { Pool } from 'pg';
 
 /**
  * Creates a LOCAL (password) user — the fallback for people whose Microsoft tenant
- * blocks ProTrack (admin consent withheld), so SSO can never complete for them.
+ * requires local fallback account.
  *
  * Usage:
- *   pnpm user:create -- --email a.laub@ccep.com --name "A. Laub" --tenant coca-cola
- *   pnpm user:create -- --email … --tenant coca-cola --role ADMIN --password "…"
- *   pnpm user:create -- --email … --tenant coca-cola --reset-password
+ *   pnpm user:create -- --email admin@example.com --name "Admin User" --tenant default
+ *   pnpm user:create -- --email … --tenant default --role ADMIN --password "…"
+ *   pnpm user:create -- --email … --tenant default --reset-password
  *
  * Omit --password to have a strong one generated and printed once.
  */
@@ -61,7 +61,7 @@ async function main() {
     throw new Error('--email <address> is required');
   }
   if (!tenantId) {
-    throw new Error('--tenant <tenantId> is required (e.g. coca-cola, prowerb, default)');
+    throw new Error('--tenant <tenantId> is required (e.g. default, tenant-a, default)');
   }
   if (!(roleArg in UserRole)) {
     throw new Error(`--role must be one of: ${Object.keys(UserRole).join(', ')}`);

@@ -597,7 +597,7 @@
         "roleDescriptions": {
           "promoterDescription": "Responsible for collecting leads during events",
           "salesRepDescription": "Responsible for analyzing collected leads and exporting data",
-          "adminDescription": "Responsible for managing events within the MEP system"
+          "adminDescription": "Responsible for managing system settings and operations"
         },
         "addUserDialog": {
           "title": "Add user",
@@ -834,7 +834,7 @@
       "skillsPlaceholder": "e.g. Skills",
       "countryPlaceholder": "e.g. Country",
       "datePlaceholderPattern": "e.g. dd/mm/yyyy",
-      "emailPlaceholderPattern": "e.g. email@ccep.com",
+      "emailPlaceholderPattern": "e.g. email@example.com",
       "addressPlaceholderPattern": "e.g. Type street, city, postcode...",
       "multiSelectPlaceholderPattern": "e.g. Select multiple options...",
       "dropdownAddonPlaceholderPattern": "e.g. Select an option or add new one...",
@@ -1394,8 +1394,8 @@
     "USER_CREATE_FAILED": "Failed to create user."
   },
   "footer": {
-    "copyright": "© {year} MEP.",
-    "copyrightCocaCola": "© Coca-Cola Europacific Partners 2026",
+    "copyright": "© {year} {{projectNameTitle}}.",
+    "copyrightCocaCola": "© {year} {{projectNameTitle}}.",
     "support": "Help",
     "supportLink": "Support",
     "privacyPolicy": "Privacy Policy",
@@ -1410,7 +1410,7 @@
   },
   "login": {
     "email": "Email",
-    "emailPlaceholder": "max.mustermann@ccep.com",
+    "emailPlaceholder": "user@example.com",
     "password": "Password",
     "passwordPlaceholder": "Min. 6 characters",
     "rememberMe": "Keep me logged in",
@@ -1419,7 +1419,7 @@
     "captchaNotReady": "Please wait a moment, security check is still loading, then try again.",
     "attemptsRemaining": "{count, plural, one {Incorrect email or password. You have # attempt remaining.} other {Incorrect email or password. You have # attempts remaining.}}",
     "accountLockedWithDuration": "{minutes, plural, one {Your account has been temporarily locked. Please try again in # minute.} other {Your account has been temporarily locked. Please try again in # minutes.}}",
-    "footerText": "By inserting your email you confirm you agree to MEP contacting you about our product and services. You can opt out at any time by clicking unsubscribe in our emails. Find out more about how we use data in our privacy policy.",
+    "footerText": "By inserting your email you confirm you agree to receive communications regarding your account. Find out more in our privacy policy.",
     "validation": {
       "emailRequired": "Email is required",
       "emailInvalid": "Please enter a valid email address",
@@ -1481,7 +1481,7 @@
     "hidePassword": "Hide password",
     "submit": "Register",
     "backToLogin": "Login",
-    "footerText": "By inserting your email you confirm you agree to MEP contacting you about our product and services. You can opt out at any time by clicking unsubscribe in our emails. Find out more about how we use data in our privacy policy.",
+    "footerText": "By inserting your email you confirm you agree to receive communications regarding your account. Find out more in our privacy policy.",
     "successMessage": "Your account has been created successfully. You can now log in.",
     "inviteMissing": "No invitation link found. Please use the link from your email.",
     "inviteInvalid": "This invitation link is invalid or has expired.",

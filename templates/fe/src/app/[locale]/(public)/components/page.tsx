@@ -26,7 +26,7 @@ export default function ComponentsPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Component Showcase</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Visual reference — CCEP theme applied to all UI components.
+            Visual reference — Default theme applied to all UI components.
           </p>
         </div>
         <SearchFilterBarSection />

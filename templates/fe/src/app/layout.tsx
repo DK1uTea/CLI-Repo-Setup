@@ -32,8 +32,8 @@ const themeInitScript = `
 `;
 
 export const metadata: Metadata = {
-  title: 'MEP - Marketing Experience Platform',
-  description: 'MEP - Marketing Experience Platform is an all-in-one marketing solution that enhances customer engagement, optimizes campaigns, and boosts conversions through data-driven insights, automation, and content management.',
+  title: '{{projectNameTitle}}',
+  description: '{{projectNameTitle}} application built with Next.js 16 and Tailwind CSS v4.',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

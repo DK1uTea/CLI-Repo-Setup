@@ -24,9 +24,9 @@ model User {
   tenant            Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
-  @@index([approvalStatus], map: "idx_pt_users_approval_status")
-  @@index([entraTid], map: "idx_pt_users_entra_tid")
-  @@map("pt_users")
+  @@index([approvalStatus], map: "idx_users_approval_status")
+  @@index([entraTid], map: "idx_users_entra_tid")
+  @@map("users")
 }
 
 enum UserRole {

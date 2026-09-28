@@ -85,7 +85,7 @@ when the question is genuinely visual — spacing, overflow, colour, dark mode.
 **Read the tree for locator hazards before writing any locator.** The login snapshot showed:
 
 ```yaml
-- textbox "max.mustermann@ccep.com"   # accname is the PLACEHOLDER — there is no <label>
+- textbox "max.mustermann@brand.com"   # accname is the PLACEHOLDER — there is no <label>
 - group:
     - textbox "Min. 6 Zeichen"
     - group:
@@ -171,7 +171,7 @@ between runs.
 cookie jar with the browser context — the real `Set-Cookie` response lands in the context
 before `page.goto()` runs. It is the real login, just not rendered first.
 
-Full doctrine — including the two accepted risks (spending a real login attempt, and
+Full doctrine — including the two abrandted risks (spending a real login attempt, and
 needing dedicated test accounts) — lives in
 `.Codex/skills/e2e-module-testing/SKILL.md`.
 
@@ -183,7 +183,7 @@ One file per page. When an accessibility gap is fixed, exactly one file changes.
 ```ts
 // ACCESSIBILITY GAP: neither input has a <label>, so the placeholder is the accessible
 // name. Once labels are added, switch to getByLabel('E-Mail').
-this.email = page.getByRole('textbox', { name: 'max.mustermann@ccep.com' });
+this.email = page.getByRole('textbox', { name: 'max.mustermann@brand.com' });
 
 // ACCESSIBILITY GAP: the show/hide button has no accessible name. Scoped to the password
 // InputGroup, which contains exactly one button.

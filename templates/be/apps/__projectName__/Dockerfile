@@ -51,7 +51,7 @@ COPY --from=deps    --chown=nestjs:nodejs /app/node_modules/prisma      ./node_m
 COPY --from=builder --chown=nestjs:nodejs /app/prisma                   ./prisma
 COPY --from=builder --chown=nestjs:nodejs /app/prisma.config.ts         ./prisma.config.ts
 
-COPY --chown=nestjs:nodejs apps/protrack-backend-api/docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --chown=nestjs:nodejs apps/{{sanitizedProjectName}}/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 
 USER nestjs

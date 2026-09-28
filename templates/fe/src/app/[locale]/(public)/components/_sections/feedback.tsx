@@ -55,12 +55,12 @@ export function FeedbackSection() {
         <p className="text-xs font-medium text-muted-foreground">Accordion</p>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>What is the MEP Dashboard?</AccordionTrigger>
-            <AccordionContent>A multi-tenant dashboard platform for managing MEP projects and assets.</AccordionContent>
+            <AccordionTrigger>What is this application?</AccordionTrigger>
+            <AccordionContent>A multi-tenant modern dashboard platform built with Next.js 16, React 19, and Tailwind CSS v4.</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
             <AccordionTrigger>How does tenant theming work?</AccordionTrigger>
-            <AccordionContent>Each tenant gets a CSS class on the html element that overrides the default CCEP theme variables.</AccordionContent>
+            <AccordionContent>Each tenant gets a CSS class or token set that overrides semantic theme variables.</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
             <AccordionTrigger>Is dark mode supported?</AccordionTrigger>

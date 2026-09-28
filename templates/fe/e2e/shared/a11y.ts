@@ -9,7 +9,7 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
  * `color-contrast` — every colour and border in this app comes from the per-tenant theme
  * (`src/styles/themes/<tenant>.css`), which is configured to match an approved design.
  * The palette is a product decision owned by design and the tenant, not something a test
- * may drive: the CCEP brand red (`--primary: oklch(0.537 0.277 27.3)`, #F40009) puts white
+ * may drive: brand primary tokens puts white
  * 16px button text at 4.21:1 against WCAG AA's 4.5:1, and "fixing" that would mean
  * repainting the brand. Contrast is therefore out of scope for automated scans repo-wide —
  * do not add per-spec exceptions, and do not write tests asserting contrast ratios.

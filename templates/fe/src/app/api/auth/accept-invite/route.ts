@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         "x-user-identifier": visitorId || "",
-        "x-mep-lang": locale || "",
+        "x-lang": locale || "",
       },
       body: JSON.stringify(body),
     });

@@ -63,11 +63,11 @@ Each tenant is a single CSS file under `src/styles/themes/<tenant>.css` that ove
 3. `@import '../styles/themes/<tenant>.css'` in `globals.css`
 4. No component code changes required
 
-**Current tenants:** CCEP (`ccep.css`)
+**Default theme:** `default.css`
 
 ## Typography
 
-The project uses **CCEP Rhythm** (a proprietary brand font with Narrow and Wide optical axes, weights 300/500/700). Font families are exposed as Tailwind utilities via `@theme inline`:
+The project uses standard modern typography configured via Next.js `next/font/google` and Tailwind v4 `@theme inline`:
 
 | Tailwind class | CSS variable | Use |
 |---|---|---|

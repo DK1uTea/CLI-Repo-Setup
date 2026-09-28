@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-mep-lang": locale || "",
+      "x-lang": locale || "",
       "x-user-identifier": req.headers.get("x-user-identifier") || "",
       Authorization: refreshToken ? `Bearer ${refreshToken}` : "",
     },

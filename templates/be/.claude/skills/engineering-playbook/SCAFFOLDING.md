@@ -185,7 +185,7 @@ CREATE UNIQUE INDEX "uq_pt_settings_global_key" ON "pt_settings"("key") WHERE "t
 Create the folder:
 
 ```
-apps/protrack-backend-api/src/modules/<feature>/
+apps/{{sanitizedProjectName}}/src/modules/<feature>/
 ├── <feature>.module.ts
 ├── <feature>.controller.ts
 ├── <feature>.service.ts
@@ -302,12 +302,12 @@ See [API-DESIGN.md §6](./API-DESIGN.md#6-input-dtos) and
 
 Add the new module to:
 
-1. `apps/protrack-backend-api/src/modules/index.ts` (barrel export):
+1. `apps/{{sanitizedProjectName}}/src/modules/index.ts` (barrel export):
    ```typescript
    export * from './<feature>/<feature>.module';
    ```
 
-2. `apps/protrack-backend-api/src/app.module.ts` (imports array):
+2. `apps/{{sanitizedProjectName}}/src/app.module.ts` (imports array):
    ```typescript
    import { XxxModule } from './modules';
 

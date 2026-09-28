@@ -40,6 +40,7 @@ function shouldExclude(srcPath, relPath, isFE) {
   if (base === '.env') return true;
 
   if (isFE) {
+    if (parts.includes('ccepRhythm')) return true;
     if (parts.includes('.playwright-mcp')) return true;
     if (parts.includes('.playwright-cli')) return true;
     if (parts.includes('playwright-report')) return true;
@@ -47,6 +48,12 @@ function shouldExclude(srcPath, relPath, isFE) {
     if (parts.includes('src') && parts.includes('.omc')) return true;
     if (parts.includes('.omc')) return true;
     if (parts.includes('.vscode') && base !== 'mcp.json') return true;
+  }
+
+  if (!isFE) {
+    if (parts.includes('tcp-server')) return true;
+    if (parts.includes('worker')) return true;
+    if (parts.includes('queue')) return true;
   }
 
   return false;
@@ -96,7 +103,7 @@ async function cleanFE() {
     await fs.writeFile(dockerMd, content, 'utf8');
   }
 
-  // Remove MEP domain features
+  // Remove specific domain features
   const featuresToRemove = [
     'calendar',
     'cam',
@@ -393,6 +400,16 @@ export function AppSidebar() {
     console.log('Cleaned up legacy feature tests from FE tests/');
   }
 
+  // Clean up legacy e2e modules
+  const e2eModulesDir = path.join(FE_DEST, 'e2e', 'modules');
+  if (await fs.pathExists(e2eModulesDir)) {
+    const e2eToRemove = ['calendar-dashboard', 'customer-activation', 'events', 'rent', 'reporting-tool', 'user-settings'];
+    for (const em of e2eToRemove) {
+      await fs.remove(path.join(e2eModulesDir, em));
+    }
+    console.log('Cleaned up legacy e2e modules');
+  }
+
   // Clean up specs in docs/
   const specsDir = path.join(FE_DEST, 'docs', 'specs');
   if (await fs.pathExists(specsDir)) {
@@ -559,31 +576,6 @@ export * from './users';
     }
   }
 
-  // Update user.prisma to remove DeviceCommand relation
-  const userPrismaPath = path.join(prismaModelsDir, 'user.prisma');
-  if (await fs.pathExists(userPrismaPath)) {
-    let userPrisma = await fs.readFile(userPrismaPath, 'utf8');
-    userPrisma = userPrisma.replace(/\s+requestedCommands\s+DeviceCommand\[\][^\n]*/g, '');
-    await fs.writeFile(userPrismaPath, userPrisma, 'utf8');
-  }
-
-  // Update tenant.prisma to remove GPS device relations
-  const tenantPrismaPath = path.join(prismaModelsDir, 'tenant.prisma');
-  if (await fs.pathExists(tenantPrismaPath)) {
-    const cleanTenantPrisma = `model Tenant {
-  id        String   @id @default(cuid()) @db.VarChar(30)
-  name      String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  users     User[]
-
-  @@map("pt_tenants")
-}
-`;
-    await fs.writeFile(tenantPrismaPath, cleanTenantPrisma, 'utf8');
-  }
-
   // Update nest-cli.json
   const nestCliPath = path.join(BE_DEST, 'nest-cli.json');
   if (await fs.pathExists(nestCliPath)) {
@@ -686,66 +678,11 @@ volumes:
     console.log('Cleaned BE docker-compose.yml');
   }
 
-  // Update swagger.util.ts
-  const swaggerUtilPath = path.join(BE_DEST, 'libs', 'core', 'src', 'utils', 'swagger.util.ts');
-  if (await fs.pathExists(swaggerUtilPath)) {
-    let content = await fs.readFile(swaggerUtilPath, 'utf8');
-    content = content.replace(/Protrack Backend API/g, '{{projectNameTitle}} API');
-    content = content.replace(/API documentation for Protrack backend/g, 'API documentation for {{projectNameTitle}}');
-    await fs.writeFile(swaggerUtilPath, content, 'utf8');
-  }
-
-  // Update .env.example
-  const envExamplePath = path.join(BE_DEST, '.env.example');
-  if (await fs.pathExists(envExamplePath)) {
-    let content = await fs.readFile(envExamplePath, 'utf8');
-    content = content.replace(/REDIS_KEY_PREFIX=protrack/g, 'REDIS_KEY_PREFIX={{sanitizedProjectName}}');
-    content = content.replace(/POSTGRES_DB=protrack/g, 'POSTGRES_DB={{projectNameDb}}');
-    content = content.replace(/localhost:5432\/protrack/g, 'localhost:5432/{{projectNameDb}}');
-    await fs.writeFile(envExamplePath, content, 'utf8');
-  }
-
   // Rename skill folder
   const oldSkillDir = path.join(BE_DEST, '.claude', 'skills', 'protrack-engineering-playbook');
   const newSkillDir = path.join(BE_DEST, '.claude', 'skills', 'engineering-playbook');
   if (await fs.pathExists(oldSkillDir)) {
     await fs.move(oldSkillDir, newSkillDir, { overwrite: true });
-    const skillMd = path.join(newSkillDir, 'SKILL.md');
-    if (await fs.pathExists(skillMd)) {
-      let content = await fs.readFile(skillMd, 'utf8');
-      content = content.replace(/name: protrack-engineering-playbook/g, 'name: engineering-playbook');
-      content = content.replace(/Protrack Engineering Playbook/g, 'Engineering Playbook');
-      await fs.writeFile(skillMd, content, 'utf8');
-    }
-  }
-
-  // Update BE CLAUDE.md
-  const claudeMdPath = path.join(BE_DEST, 'CLAUDE.md');
-  if (await fs.pathExists(claudeMdPath)) {
-    let claudeMd = await fs.readFile(claudeMdPath, 'utf8');
-    claudeMd = claudeMd.replace(
-      /# CLAUDE\.md — Protrack Backend API[\s\S]*?## Tech Stack/,
-      `# CLAUDE.md — Backend API Starter (NestJS Monorepo)
-
-Đọc toàn bộ file này trước khi thực hiện bất kỳ thay đổi nào.
-
----
-
-## Tổng quan dự án
-
-Template Backend REST API chuẩn doanh nghiệp, xây dựng theo kiến trúc **NestJS Monorepo** với **Service/Repository Pattern**, hỗ trợ **Multi-tenancy**, **Prisma ORM**, **PostgreSQL/TimescaleDB**, và **Redis Cache**.
-
-- Toàn bộ truy cập database phải thông qua repository interface trong \`@app/layer-data\`.
-- Controllers chỉ làm nhiệm vụ dispatch và serialize, không chứa business logic.
-- Services xử lý nghiệp vụ, gọi qua Repositories.
-- Tuân thủ quy ước DTO validation, HTTP response format chuẩn và mã lỗi Api*HttpError.
-
----
-
-## Tech Stack`,
-    );
-    claudeMd = claudeMd.replace(/│\s+└── tcp-server\/[\s\S]*?apps\/worker\/tsconfig\.app\.json/g, '');
-    await fs.writeFile(claudeMdPath, claudeMd, 'utf8');
   }
 }
 
@@ -756,7 +693,7 @@ async function main() {
   await copyRepo(BE_SRC, BE_DEST, false);
   await cleanBE();
 
-  console.log('Templates preparation and base refinement completed successfully!');
+  console.log('Templates preparation completed successfully!');
 }
 
 main().catch((err) => {

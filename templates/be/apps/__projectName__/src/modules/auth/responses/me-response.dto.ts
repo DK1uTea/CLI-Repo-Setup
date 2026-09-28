@@ -7,7 +7,7 @@ export class MeResponseDto {
   @Expose()
   id!: string;
 
-  @ApiProperty({ example: 'admin@protrack.com' })
+  @ApiProperty({ example: 'admin@example.com' })
   @Expose()
   email!: string;
 

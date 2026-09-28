@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         Authorization: accessToken,
-        "x-mep-lang": locale,
+        "x-lang": locale,
         "x-user-identifier": visitorId,
       },
       body: JSON.stringify({ token: refreshToken ?? "" }),

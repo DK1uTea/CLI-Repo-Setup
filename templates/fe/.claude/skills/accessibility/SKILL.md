@@ -128,7 +128,7 @@ report it as a finding.**
 
 Every colour and border comes from the per-tenant theme in `src/styles/themes/<tenant>.css`,
 which is configured by design to match an approved brand. The palette is a product decision
-owned by design and the tenant, not something code or a test may drive. The CCEP brand red
+owned by design and the tenant, not something code or a test may drive. The Brand brand red
 (`--primary: oklch(0.537 0.277 27.3)`, #F40009) puts white 16px button text at 4.21:1
 against WCAG AA's 4.5:1 — "fixing" that would mean repainting the brand.
 

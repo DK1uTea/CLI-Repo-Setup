@@ -597,7 +597,7 @@
         "roleDescriptions": {
           "promoterDescription": "Verantwortlich für das Sammeln von Leads während Events",
           "salesRepDescription": "Verantwortlich für die Analyse gesammelter Leads und den Datenexport",
-          "adminDescription": "Verantwortlich für die Verwaltung von Systemeinstellungen und Benutzern"
+          "adminDescription": "Verantwortlich für die Verwaltung von Events im MEP-System"
         },
         "addUserDialog": {
           "title": "Benutzer hinzufügen",
@@ -834,7 +834,7 @@
       "skillsPlaceholder": "z. B. Fähigkeiten",
       "countryPlaceholder": "z. B. Land",
       "datePlaceholderPattern": "z. B. tt.mm.jjjj",
-      "emailPlaceholderPattern": "z. B. e-mail@example.com",
+      "emailPlaceholderPattern": "z. B. e-mail@ccep.com",
       "addressPlaceholderPattern": "z. B. Straße, Stadt, Postleitzahl eingeben...",
       "multiSelectPlaceholderPattern": "z. B. Mehrere Optionen auswählen...",
       "dropdownAddonPlaceholderPattern": "z. B. Option auswählen oder neue hinzufügen...",
@@ -1419,7 +1419,7 @@
     "captchaNotReady": "Bitte warten Sie einen Moment, die Sicherheitsüberprüfung wird noch geladen, und versuchen Sie es dann erneut.",
     "attemptsRemaining": "{count, plural, one {Falsche E-Mail-Adresse oder falsches Passwort. Sie haben noch # Versuch.} other {Falsche E-Mail-Adresse oder falsches Passwort. Sie haben noch # Versuche.}}",
     "accountLockedWithDuration": "{minutes, plural, one {Ihr Konto wurde vorübergehend gesperrt. Bitte versuchen Sie es in # Minute erneut.} other {Ihr Konto wurde vorübergehend gesperrt. Bitte versuchen Sie es in # Minuten erneut.}}",
-    "footerText": "Durch Eingabe Ihrer E-Mail-Adresse bestätigen Sie, dass Sie damit einverstanden sind, Mitteilungen zu Ihrem Konto zu erhalten. Weitere Informationen finden Sie in unserer Datenschutzerklärung.",
+    "footerText": "Durch Eingabe Ihrer E-Mail-Adresse bestätigen Sie, dass Sie damit einverstanden sind, von MEP zu unseren Produkten und Dienstleistungen kontaktiert zu werden. Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie in unseren E-Mails auf „Abmelden“ klicken. Weitere Informationen über die Verwendung Ihrer Daten finden Sie in unserer Datenschutzerklärung.",
     "validation": {
       "emailRequired": "E-Mail ist erforderlich",
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -1481,7 +1481,7 @@
     "hidePassword": "Passwort ausblenden",
     "submit": "Registrieren",
     "backToLogin": "Anmelden",
-    "footerText": "Mit der Eingabe Ihrer E-Mail bestätigen Sie, dass Sie damit einverstanden sind, Mitteilungen zu Ihrem Konto zu erhalten. Weitere Informationen finden Sie in unserer Datenschutzerklärung.",
+    "footerText": "Mit der Eingabe Ihrer E-Mail bestätigen Sie, dass MEP Sie zu unseren Produkten und Dienstleistungen kontaktieren darf. Sie können sich jederzeit abmelden, indem Sie in unseren E-Mails auf \"Abmelden\" klicken. Erfahren Sie mehr darüber, wie wir Daten in unserer Datenschutzerklärung verwenden.",
     "successMessage": "Ihr Konto wurde erfolgreich erstellt. Sie können sich jetzt anmelden.",
     "inviteMissing": "Kein Einladungslink gefunden. Bitte verwenden Sie den Link aus Ihrer E-Mail.",
     "inviteInvalid": "Dieser Einladungslink ist ungültig oder abgelaufen.",

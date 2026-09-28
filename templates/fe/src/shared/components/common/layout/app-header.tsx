@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { AlignJustifyIcon } from 'lucide-react';
 import { useSidebar } from '@/shared/components/ui/sidebar';
@@ -27,9 +27,9 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b border-border bg-background-header px-6 py-3">
-      {/* Mobile: App Title */}
-      <div className="md:hidden font-bold text-primary truncate max-w-[160px]">
-        {{projectNameTitle}}
+      {/* Mobile: title */}
+      <div className="md:hidden font-bold text-lg text-primary">
+        <span>{{projectNameTitle}}</span>
       </div>
 
       {/* Desktop: breadcrumbs */}
@@ -75,7 +75,7 @@ function UserMenu({ logoutLabel, userSettingsLabel }: { logoutLabel: string; use
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative outline-none cursor-pointer">
+        <button className="relative outline-none">
           <Avatar className="size-10">
             <AvatarImage src={user.avatar || undefined} alt={displayName || user.email || 'User'} />
             <AvatarFallback>{initials}</AvatarFallback>
@@ -96,7 +96,7 @@ function UserMenu({ logoutLabel, userSettingsLabel }: { logoutLabel: string; use
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/dashboards">
+          <Link href="/user-settings">
             <IconUserSettings className="size-4" />
             {userSettingsLabel}
           </Link>

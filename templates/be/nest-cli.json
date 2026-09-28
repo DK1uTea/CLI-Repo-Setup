@@ -37,15 +37,6 @@
         "tsConfigPath": "apps/{{sanitizedProjectName}}/tsconfig.app.json"
       }
     },
-    "tcp-server": {
-      "type": "application",
-      "root": "apps/tcp-server",
-      "entryFile": "main",
-      "sourceRoot": "apps/tcp-server/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/tcp-server/tsconfig.app.json"
-      }
-    },
     "third-party": {
       "type": "library",
       "root": "libs/third-party",
@@ -53,15 +44,6 @@
       "sourceRoot": "libs/third-party/src",
       "compilerOptions": {
         "tsConfigPath": "libs/third-party/tsconfig.lib.json"
-      }
-    },
-    "worker": {
-      "type": "application",
-      "root": "apps/worker",
-      "entryFile": "main",
-      "sourceRoot": "apps/worker/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/worker/tsconfig.app.json"
       }
     }
   }

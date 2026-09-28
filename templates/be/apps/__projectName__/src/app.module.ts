@@ -1,10 +1,6 @@
 import {
   appConfiguration,
   appSchema,
-  awsConfiguration,
-  awsSchema,
-  entraConfiguration,
-  entraSchema,
   HttpExceptionFilter,
   ResponseInterceptor,
   RolesGuard,
@@ -12,22 +8,12 @@ import {
   redisSchema,
   SerializerInterceptor,
 } from '@app/core';
-import { AwsModule, CacheModule, PrismaModule } from '@app/third-party';
+import { CacheModule, PrismaModule } from '@app/third-party';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import Joi from 'joi';
-import {
-  AnalyticsModule,
-  AuthModule,
-  DevicesModule,
-  EventsModule,
-  PositionsModule,
-  SettingsModule,
-  TenantsModule,
-  UploadModule,
-  UsersModule,
-} from './modules';
+import { AuthModule, TenantsModule, UsersModule } from './modules';
 import { JwtAuthGuard } from './modules/auth/guards';
 
 @Module({
@@ -37,22 +23,13 @@ import { JwtAuthGuard } from './modules/auth/guards';
       validationSchema: Joi.object({
         ...appSchema,
         ...redisSchema,
-        ...awsSchema,
-        ...entraSchema,
       }),
-      load: [appConfiguration, redisConfiguration, awsConfiguration, entraConfiguration],
+      load: [appConfiguration, redisConfiguration],
     }),
     PrismaModule,
     CacheModule,
-    AwsModule,
-    AnalyticsModule,
     AuthModule,
-    DevicesModule,
-    EventsModule,
-    PositionsModule,
-    SettingsModule,
     TenantsModule,
-    UploadModule,
     UsersModule,
   ],
   providers: [

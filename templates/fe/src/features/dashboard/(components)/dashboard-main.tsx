@@ -1,63 +1,89 @@
-'use client'
+'use client';
 
-import { CalendarDaysIcon, PlusIcon } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-
-import { Button } from '@/shared/components/ui/button'
-import { useUserStore, useDateFormat } from '@/shared/stores/use-user-store'
-import { ComponentGuard } from '@/shared/components/common/component-guard'
-import { WelcomeGreeting } from '@/shared/components/common/welcome-greeting'
-import { PERMISSIONS } from '@/shared/constants/permissions'
-
-import DashboardEvents from './dashboard-events'
-import DashboardCharts from './dashboard-charts'
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
+import { Sparkles, Code2, ShieldCheck, Terminal } from 'lucide-react';
 
 export default function DashboardMain() {
-  const t = useTranslations('dashboard')
-  const user = useUserStore((s) => s.user)
-  const permissions = useUserStore((s) => s.permissions)
-  const dateFormat = useDateFormat()
-
   return (
-    <div className="flex flex-col gap-6">
-      <WelcomeGreeting
-        firstName={user.firstName}
-        lastName={user.lastName}
-        lastLogin={user.lastLoginAt ?? null}
-        dateFormat={dateFormat}
-      />
-
-      <div className="flex flex-wrap items-center gap-3 mt-4">
-        <ComponentGuard requiredKeys={[PERMISSIONS.Event.Management, PERMISSIONS.Event.Create]}>
-          <Button href="/events/new-event">
-            <PlusIcon className="size-4.5" />
-            {t('createEvent')}
-          </Button>
-        </ComponentGuard>
-        <ComponentGuard
-          requiredKeys={[
-            PERMISSIONS.Event.Management,
-            PERMISSIONS.Event.List.Active,
-            PERMISSIONS.Event.List.Draft,
-          ]}
-        >
-          <Button variant="outline-primary" href="/events?tab=calendar">
-            <CalendarDaysIcon className="size-4.5" />
-            {t('goToCalendar')}
-          </Button>
-        </ComponentGuard>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+          <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
+            Starter Base
+          </Badge>
+        </div>
+        <p className="text-muted-foreground">
+          Welcome to your new Next.js 16 + React 19 + Tailwind CSS v4 application.
+        </p>
       </div>
 
-      {permissions !== null && (
-        <ComponentGuard
-          requiredKeys={[PERMISSIONS.Event.Management, PERMISSIONS.Event.List.Active]}
-        >
-          <DashboardEvents />
-        </ComponentGuard>
-      )}
-      <div className="mt-5">
-        <DashboardCharts />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Framework</CardTitle>
+            <Sparkles className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Next.js 16</div>
+            <p className="text-xs text-muted-foreground mt-1">App Router + React 19</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Styling</CardTitle>
+            <Code2 className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Tailwind v4</div>
+            <p className="text-xs text-muted-foreground mt-1">Radix Nova + Shadcn UI</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">AI Rules</CardTitle>
+            <ShieldCheck className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">AGENTS.md</div>
+            <p className="text-xs text-muted-foreground mt-1">CLAUDE.md + Agent Skills</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Testing</CardTitle>
+            <Terminal className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">Vitest + E2E</div>
+            <p className="text-xs text-muted-foreground mt-1">Playwright configured</p>
+          </CardContent>
+        </Card>
       </div>
+
+      <Card className="border-dashed">
+        <CardHeader>
+          <CardTitle>Getting Started</CardTitle>
+          <CardDescription>
+            You can start developing new modules under <code className="font-mono text-primary">src/features/&lt;module&gt;</code>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Follow the architectural playbook in <code className="font-mono">CLAUDE.md</code> and <code className="font-mono">AGENTS.md</code> to build scalable, accessible, and type-safe features.
+          </p>
+          <div className="flex gap-3">
+            <Button size="sm">Create New Feature</Button>
+            <Button size="sm" variant="outline">View Architecture Docs</Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }

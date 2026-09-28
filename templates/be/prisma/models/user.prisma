@@ -22,7 +22,6 @@ model User {
   updatedAt      DateTime           @updatedAt @map("updated_at")
 
   tenant            Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  requestedCommands DeviceCommand[] @relation("RequestedByUser")
 
   @@index([tenantId])
   @@index([approvalStatus], map: "idx_pt_users_approval_status")

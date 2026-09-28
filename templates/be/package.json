@@ -14,8 +14,6 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/{{sanitizedProjectName}}/main",
     "dev:api": "nest start {{sanitizedProjectName}} --watch",
-    "dev:tcp-server": "nest start tcp-server --watch",
-    "dev:worker": "nest start worker --watch",
     "lint": "biome lint --write .",
     "check": "biome check --write .",
     "prisma:generate": "prisma generate",

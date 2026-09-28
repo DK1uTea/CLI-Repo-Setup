@@ -4,17 +4,7 @@ model Tenant {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  settings      Setting[]
-  users         User[]
-  devices       Device[]
-  deviceStatus  DeviceStatus[]
-  positions     Position[]
-  events        Event[]
-  deviceCommands DeviceCommand[]
-  deviceCommandLogs DeviceCommandLog[]
-  geofences     Geofence[]
-  geofenceAssignments GeofenceAssignment[]
-  geofenceStates GeofenceState[]
+  users     User[]
 
   @@map("pt_tenants")
 }

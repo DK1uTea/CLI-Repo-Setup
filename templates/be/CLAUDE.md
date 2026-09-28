@@ -1,4 +1,4 @@
-# CLAUDE.md — Protrack Backend API
+# CLAUDE.md — Backend API Starter (NestJS Monorepo)
 
 Đọc toàn bộ file này trước khi thực hiện bất kỳ thay đổi nào.
 
@@ -6,12 +6,12 @@
 
 ## Tổng quan dự án
 
-**Protrack** là nền tảng Asset Tracking GPS multi-tenant dành cho B2B logistics.
-Backend nhận dữ liệu từ thiết bị GPS qua TCP, lưu vào PostgreSQL/TimescaleDB, và cung cấp REST API cho customer portal.
+Template Backend REST API chuẩn doanh nghiệp, xây dựng theo kiến trúc **NestJS Monorepo** với **Service/Repository Pattern**, hỗ trợ **Multi-tenancy**, **Prisma ORM**, **PostgreSQL/TimescaleDB**, và **Redis Cache**.
 
-**Pilot:** 50 thiết bị GPS Cantrack GT60 (chip SIMCom A7670E).
-**Mục tiêu scale:** 100.000 devices.
-**Giao thức thiết bị:** GT06 binary protocol (primary), CANTRACK ASCII (secondary).
+- Toàn bộ truy cập database phải thông qua repository interface trong `@app/layer-data`.
+- Controllers chỉ làm nhiệm vụ dispatch và serialize, không chứa business logic.
+- Services xử lý nghiệp vụ, gọi qua Repositories.
+- Tuân thủ quy ước DTO validation, HTTP response format chuẩn và mã lỗi Api*HttpError.
 
 ---
 

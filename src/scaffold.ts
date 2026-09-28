@@ -67,7 +67,13 @@ export async function copyTemplateFiles(srcDir: string, destDir: string): Promis
     overwrite: true,
     filter: (src) => {
       const base = path.basename(src);
-      if (base === 'node_modules' || base === '.git' || base === '.next' || base === 'dist') {
+      if (
+        base === 'node_modules' ||
+        base === '.git' ||
+        base === '.next' ||
+        base === 'dist' ||
+        base === 'template-shims.d.ts'
+      ) {
         return false;
       }
       return true;

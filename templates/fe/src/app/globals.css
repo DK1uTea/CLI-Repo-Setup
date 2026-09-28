@@ -2,8 +2,86 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Tenant themes */
-@import "../styles/themes/default.css";
+/* Tenant themes — add new tenants here */
+@import "../styles/themes/ccep.css";
+
+/* CCEP Rhythm — Default width */
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Light.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Light.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Medium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Medium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-Dark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-Dark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* CCEP Rhythm — Narrow */
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowLight.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowLight.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowMedium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowMedium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Narrow";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowDark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-NarrowDark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* CCEP Rhythm — Wide */
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideLight.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideLight.woff") format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideMedium.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideMedium.woff") format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CCEP Rhythm Wide";
+  src:
+    url("/fonts/ccepRhythm/CCEPRhythm-WideDark.woff2") format("woff2"),
+    url("/fonts/ccepRhythm/CCEPRhythm-WideDark.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 

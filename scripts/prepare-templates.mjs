@@ -242,13 +242,6 @@ export default function DashboardMain() {
     }
   }
 
-  // Remove [policy] route
-  const policyDir = path.join(FE_DEST, 'src', 'app', '[locale]', '(public)', '[policy]');
-  if (await fs.pathExists(policyDir)) {
-    await fs.remove(policyDir);
-    console.log('Removed FE [policy] public route');
-  }
-
   // Ensure clean dashboards page
   const dashboardsDir = path.join(privateDir, 'dashboards');
   await fs.ensureDir(dashboardsDir);
@@ -411,6 +404,13 @@ export function AppSidebar() {
       'utf8',
     );
   }
+
+  // Create ambient type shims for clean IDE experience in root workspace
+  await fs.writeFile(
+    path.join(FE_DEST, 'src', 'template-shims.d.ts'),
+    "/**\n * Ambient type shims for template development in root workspace.\n * Prevents IDE from showing 'Cannot find module' errors.\n * Automatically excluded when scaffolding new projects.\n */\ndeclare module '*';\n",
+    'utf8',
+  );
 }
 
 async function cleanBE() {
@@ -754,6 +754,16 @@ Template Backend REST API chuẩn doanh nghiệp, xây dựng theo kiến trúc 
     claudeMd = claudeMd.replace(/│\s+└── tcp-server\/[\s\S]*?apps\/worker\/tsconfig\.app\.json/g, '');
     await fs.writeFile(claudeMdPath, claudeMd, 'utf8');
   }
+
+  // Create ambient type shims for clean IDE experience in root workspace
+  const shimContent =
+    "/**\n * Ambient type shims for template development in root workspace.\n * Prevents IDE from showing 'Cannot find module' errors.\n * Automatically excluded when scaffolding new projects.\n */\ndeclare module '*';\n";
+  await fs.writeFile(path.join(BE_DEST, 'template-shims.d.ts'), shimContent, 'utf8');
+  await fs.writeFile(
+    path.join(BE_DEST, 'apps', '__projectName__', 'src', 'template-shims.d.ts'),
+    shimContent,
+    'utf8',
+  );
 }
 
 async function main() {

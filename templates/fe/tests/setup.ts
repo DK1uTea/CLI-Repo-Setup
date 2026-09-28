@@ -47,22 +47,3 @@ if (!window.HTMLElement.prototype.hasPointerCapture) {
 if (!window.HTMLElement.prototype.scrollIntoView) {
   window.HTMLElement.prototype.scrollIntoView = () => {};
 }
-
-if (typeof window !== 'undefined') {
-  if (!window.URL.createObjectURL) {
-    window.URL.createObjectURL = () => 'blob:mock';
-  } else {
-    const origCreate = window.URL.createObjectURL;
-    window.URL.createObjectURL = vi.fn((blob: Blob) => {
-      try {
-        return origCreate(blob);
-      } catch {
-        return 'blob:mock';
-      }
-    });
-  }
-  if (!window.URL.revokeObjectURL) {
-    window.URL.revokeObjectURL = vi.fn();
-  }
-}
-

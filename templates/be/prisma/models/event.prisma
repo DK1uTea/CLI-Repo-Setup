@@ -1,0 +1,45 @@
+enum EventType {
+  // Geofence
+  ENTERED_GEOFENCE
+  EXITED_GEOFENCE
+
+  // Connectivity
+  DEVICE_ONLINE
+  DEVICE_OFFLINE
+
+  // Device health
+  LOW_BATTERY
+
+  // Movement alerts (parsed from GT06 0x16 alarm packet)
+  OVERSPEED
+  VIBRATION
+  REMOVAL
+
+  CUSTOM
+}
+
+model Event {
+  id         BigInt    @id @default(autoincrement())
+  deviceId   String    @map("device_id") @db.VarChar(30)
+  tenantId   String    @map("tenant_id") @db.VarChar(30)
+  deviceTime DateTime  @map("device_time")
+  geofenceId String?   @map("geofence_id") @db.VarChar(30)
+  type       EventType
+  code       String?   @db.VarChar(50)
+  message    String?   @db.VarChar(500)
+  payload    Json?
+  positionId BigInt?   @map("position_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  device   Device    @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  geofence Geofence? @relation(fields: [geofenceId], references: [id], onDelete: SetNull)
+  position Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, deviceTime], map: "idx_pt_events_tenant_time")
+  @@index([deviceId, deviceTime], map: "idx_pt_events_device_time")
+  @@index([geofenceId, deviceTime], map: "idx_pt_events_geofence_time")
+  @@index([type, deviceTime], map: "idx_pt_events_type_time")
+  @@index([deviceTime], type: Brin, map: "idx_pt_events_time_brin")
+  @@map("pt_events")
+}

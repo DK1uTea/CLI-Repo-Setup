@@ -1,0 +1,48 @@
+model User {
+  id             String             @id @default(cuid()) @db.VarChar(30)
+  email          String             @unique @db.VarChar(255)
+  passwordHash   String?            @map("password_hash") @db.VarChar(255)
+  name           String             @db.VarChar(255)
+  avatar         String?            @db.VarChar(500)
+  role           UserRole           @default(USER)
+  tenantId       String             @map("tenant_id") @db.VarChar(30)
+  isActive       Boolean            @default(true) @map("is_active")
+
+  // --- Authentication provider ---
+  authProvider   AuthProvider       @default(LOCAL) @map("auth_provider")
+  entraOid       String?            @unique @map("entra_oid") @db.VarChar(64)
+  entraTid       String?            @map("entra_tid") @db.VarChar(64)
+
+  // --- Admin approval workflow (Entra self-registration) ---
+  approvalStatus UserApprovalStatus @default(PENDING) @map("approval_status")
+  approvedById   String?            @map("approved_by_id") @db.VarChar(30)
+  approvedAt     DateTime?          @map("approved_at")
+
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  tenant            Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  requestedCommands DeviceCommand[] @relation("RequestedByUser")
+
+  @@index([tenantId])
+  @@index([approvalStatus], map: "idx_pt_users_approval_status")
+  @@index([entraTid], map: "idx_pt_users_entra_tid")
+  @@map("pt_users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum AuthProvider {
+  LOCAL
+  ENTRA
+}
+
+enum UserApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

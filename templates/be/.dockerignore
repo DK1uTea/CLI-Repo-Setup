@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Husky / lint tools
+.husky
+.biome
+biome.json
+
+# IDE
+.vscode
+.idea
+*.code-workspace
+
+# Env files (inject at runtime via docker secrets / env vars)
+.env
+.env.*
+
+# Test files
+coverage
+**/*.spec.ts
+**/*.e2e-spec.ts
+test
+
+# Docs
+*.md
+!CLAUDE.md
+
+# Temp / OS
+.DS_Store
+Thumbs.db
+*.log
+tmp
+
+# pnpm cache (store will be used via mount, not baked in)
+.npmrc
+.pnpm-debug.log
+
+# Docker files (không cần bên trong image)
+docker-compose*.yml
+Dockerfile*
+
+# Seed (chỉ dùng local, không dùng trong production image)
+prisma/seed.ts

@@ -1,0 +1,10 @@
+import { UserRole } from '@prisma/client';
+
+export type AuthUser = {
+  sub: string;
+  email: string;
+  role: UserRole;
+  tenantId: string;
+  iat?: number;
+  exp?: number;
+};

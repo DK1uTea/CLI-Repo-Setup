@@ -1,0 +1,73 @@
+name: CI Security Gate
+
+on:
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+jobs:
+  sonarqube:
+    name: SonarQube SAST
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          # Community edition: override so scan-action does not inject
+          # sonar.pullrequest.* params (Community rejects them).
+          GITHUB_EVENT_NAME: push
+        with:
+          args: >
+            -Dsonar.projectKey=mepsaas-dashboard-fe
+            -Dsonar.sources=src
+            -Dsonar.exclusions=**/*.spec.ts,**/*.test.ts,**/node_modules/**,dist/**,coverage/**,.next/**,.github/**
+      - uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  trivy:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aquasecurity/trivy-action@master
+        continue-on-error: true  # Bridge: known HIGH vulns in transitive deps pending upgrade
+        with:
+          scan-type: fs
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
+
+  gitleaks:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Run Gitleaks
+        run: |
+          docker run --rm -v "$(pwd):/path" \
+            zricethezav/gitleaks:latest \
+            detect --source /path --redact --exit-code 1
+
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-latest
+    needs: [sonarqube, trivy, gitleaks]
+    if: always()
+    steps:
+      - name: Check gate
+        run: |
+          FAIL=0
+          [[ "${{ needs.sonarqube.result }}" != "success" ]] && { echo "❌ SonarQube Quality Gate FAILED"; FAIL=1; }
+          [[ "${{ needs.gitleaks.result }}" != "success" ]] && { echo "❌ Gitleaks Secrets Detection FAILED"; FAIL=1; }
+          # trivy is continue-on-error (bridge until deps upgraded); gitleaks is hard-gate
+          [[ $FAIL -eq 1 ]] && exit 1
+          echo "✅ Security gate passed"

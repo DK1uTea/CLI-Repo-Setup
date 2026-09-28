@@ -1,0 +1,58 @@
+{
+  "name": "create-my-stack",
+  "version": "0.1.0",
+  "description": "CLI scaffolding tool to bootstrap modern Frontend (Next.js) and Backend (NestJS Monorepo) projects",
+  "type": "module",
+  "bin": {
+    "create-my-stack": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/ tests/",
+    "test": "vitest run --exclude 'tests/e2e-full.test.ts'",
+    "test:e2e": "vitest run tests/e2e.test.ts",
+    "test:full": "E2E_FULL=1 vitest run tests/e2e-full.test.ts",
+    "format": "prettier --write src/ tests/"
+  },
+  "keywords": [
+    "cli",
+    "scaffolding",
+    "nextjs",
+    "nestjs",
+    "template"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clack/prompts": "^1.8.1",
+    "cac": "^7.0.0",
+    "execa": "^10.0.1",
+    "fs-extra": "^11.4.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

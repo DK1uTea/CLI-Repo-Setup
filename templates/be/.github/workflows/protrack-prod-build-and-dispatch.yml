@@ -1,0 +1,208 @@
+name: ProTrack Prod - Build Changed Services
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'libs/**'
+      - 'prisma/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'nest-cli.json'
+      - 'tsconfig*.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: eu-central-1
+  AWS_ACCOUNT_ID: "324568508772"
+  ECR_REGISTRY: 324568508772.dkr.ecr.eu-central-1.amazonaws.com
+
+jobs:
+  detect:
+    name: Detect Changed Services
+    runs-on: ubuntu-latest
+    outputs:
+      tcp: ${{ steps.filter.outputs.tcp }}
+      api: ${{ steps.filter.outputs.api }}
+      worker: ${{ steps.filter.outputs.worker }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            tcp:
+              - 'apps/tcp-server/**'
+              - 'libs/**'
+              - 'prisma/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'nest-cli.json'
+              - 'tsconfig*.json'
+            api:
+              - 'apps/protrack-backend-api/**'
+              - 'libs/**'
+              - 'prisma/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'nest-cli.json'
+              - 'tsconfig*.json'
+            worker:
+              - 'apps/worker/**'
+              - 'libs/**'
+              - 'prisma/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'nest-cli.json'
+              - 'tsconfig*.json'
+
+      - name: Generate image tag
+        id: meta
+        run: |
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "image_tag=sha-${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+  build-tcp:
+    name: Build tcp-server
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.tcp == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROTRACK_PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROTRACK_PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push tcp image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/tcp-server/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.ECR_REGISTRY }}/protrack/tcp-ingestion:${{ needs.detect.outputs.image_tag }}
+            ${{ env.ECR_REGISTRY }}/protrack/tcp-ingestion:latest
+          provenance: false
+
+      - name: Dispatch deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          repository: ProwerbDigital/multi-project-deployments
+          event-type: deploy-protrack-service-prod
+          client-payload: |
+            {
+              "service": "tcp-ingestion",
+              "image_tag": "${{ needs.detect.outputs.image_tag }}",
+              "commit_sha": "${{ github.sha }}",
+              "triggered_by": "${{ github.actor }}"
+            }
+
+  build-api:
+    name: Build backend-api
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROTRACK_PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROTRACK_PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push api image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/protrack-backend-api/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.ECR_REGISTRY }}/protrack/backend-api:${{ needs.detect.outputs.image_tag }}
+            ${{ env.ECR_REGISTRY }}/protrack/backend-api:latest
+          provenance: false
+
+      - name: Dispatch deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          repository: ProwerbDigital/multi-project-deployments
+          event-type: deploy-protrack-service-prod
+          client-payload: |
+            {
+              "service": "backend-api",
+              "image_tag": "${{ needs.detect.outputs.image_tag }}",
+              "commit_sha": "${{ github.sha }}",
+              "triggered_by": "${{ github.actor }}"
+            }
+
+  build-worker:
+    name: Build worker
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.worker == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROTRACK_PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROTRACK_PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/worker/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.ECR_REGISTRY }}/protrack/worker:${{ needs.detect.outputs.image_tag }}
+            ${{ env.ECR_REGISTRY }}/protrack/worker:latest
+          provenance: false
+
+      - name: Dispatch deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          repository: ProwerbDigital/multi-project-deployments
+          event-type: deploy-protrack-service-prod
+          client-payload: |
+            {
+              "service": "worker",
+              "image_tag": "${{ needs.detect.outputs.image_tag }}",
+              "commit_sha": "${{ github.sha }}",
+              "triggered_by": "${{ github.actor }}"
+            }

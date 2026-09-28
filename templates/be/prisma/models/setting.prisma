@@ -1,0 +1,17 @@
+model Setting {
+  id          String   @id @default(cuid()) @db.VarChar(30)
+  tenantId    String?  @map("tenant_id") @db.VarChar(30)
+  key         String   @db.VarChar(100)
+  value       Json
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedById String?  @map("updated_by_id") @db.VarChar(30)
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Uniqueness enforced via 2 partial indexes trong migration SQL
+  // vì Prisma không hỗ trợ partial unique index:
+  //   uq_pt_settings_global_key : WHERE tenant_id IS NULL
+  //   uq_pt_settings_tenant_key : WHERE tenant_id IS NOT NULL
+  @@unique([tenantId, key], map: "idx_pt_settings_tenant_key")
+  @@map("pt_settings")
+}

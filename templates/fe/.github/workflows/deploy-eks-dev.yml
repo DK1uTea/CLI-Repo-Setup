@@ -1,0 +1,102 @@
+name: MEP Dashboard FE Build and Deploy to EKS Dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - '.github/workflows/deploy-eks-dev.yml'
+  workflow_dispatch:
+
+jobs:
+  prepare-metadata:
+    name: Prepare Build Metadata
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "tag=dev-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+  build-push:
+    name: Build and Push mep-dashboard-fe
+    runs-on: ubuntu-latest
+    needs: [prepare-metadata]
+    environment: develop
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::630006584064:role/mepsaas-dev-github-actions-mep-dashboard-fe
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+            NEXT_PUBLIC_API_VERSION=${{ vars.NEXT_PUBLIC_API_VERSION }}
+            NEXT_PUBLIC_IMAGE_HOST=${{ vars.NEXT_PUBLIC_IMAGE_HOST }}
+            NEXT_PUBLIC_VERSION=${{ vars.NEXT_PUBLIC_VERSION }}
+            NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+            NEXT_PUBLIC_TENANT_SLUG=${{ vars.NEXT_PUBLIC_TENANT_SLUG }}
+          tags: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/mepsaasv2/mep-dashboard-fe:${{ needs.prepare-metadata.outputs.tag }}
+          provenance: false
+
+  update-manifests:
+    name: Update image tag in multi-project-deployments
+    runs-on: ubuntu-latest
+    needs: [prepare-metadata, build-push]
+    environment: develop
+    steps:
+      - name: Checkout multi-project-deployments
+        uses: actions/checkout@v4
+        with:
+          repository: ProwerbDigital/multi-project-deployments
+          token: ${{ secrets.GH_TOKEN }}
+          path: deployments
+      - name: Bump image tag
+        env:
+          TAG: ${{ needs.prepare-metadata.outputs.tag }}
+        run: |
+          cd deployments
+          FILE="k8s/mepsaas/environments/dev/values/mep-dashboard-fe-values.yaml"
+          sed -i "s/^  tag: .*/  tag: ${TAG}/" "$FILE"
+          grep -n "tag:" "$FILE"
+      - name: Commit, open PR and auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          cd deployments
+          git config user.name "mep-dashboard-fe-ci"
+          git config user.email "ci@prowerb.dev"
+          git add k8s/mepsaas/environments/dev/values/mep-dashboard-fe-values.yaml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          BRANCH="bump-mep-dashboard-fe-tag-${{ github.sha }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(mep-dashboard-fe): bump image tag to ${{ needs.prepare-metadata.outputs.tag }} [skip ci]"
+          git push origin "$BRANCH"
+          gh pr create --repo ProwerbDigital/multi-project-deployments \
+            --base main --head "$BRANCH" \
+            --title "chore(mep-dashboard-fe): bump image tag to ${{ needs.prepare-metadata.outputs.tag }}" \
+            --body "Automated tag bump from mep-dashboard-fe CI run ${{ github.run_id }}."
+          # multi-project-deployments' main branch has no branch protection
+          # configured, so GitHub's auto-merge (`--auto`) always fails with
+          # "Protected branch rules not configured for this branch" — there's
+          # nothing to defer to. Merge immediately instead.
+          gh pr merge "$BRANCH" --repo ProwerbDigital/multi-project-deployments --squash --delete-branch

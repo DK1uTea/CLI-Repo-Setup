@@ -1,0 +1,32 @@
+model Position {
+  id           BigInt   @id @default(autoincrement())
+  deviceId     String   @map("device_id") @db.VarChar(30)
+  tenantId     String   @map("tenant_id") @db.VarChar(30)
+  deviceTime   DateTime @map("device_time")
+  address      String?  @db.VarChar(500)
+  latitude     Decimal  @db.Decimal(10, 7)
+  longitude    Decimal  @db.Decimal(10, 7)
+  accuracy     Float?
+  altitude     Float?
+  speedKph     Float?   @map("speed_kph")
+  heading      Int?     // 0–360 degrees, dùng cho arrow animation trên live map
+  satellites   Int?     // số vệ tinh, đánh giá chất lượng GPS signal
+  gpsValid     Boolean  @default(true) @map("gps_valid")
+  // Snapshot telemetry tại thời điểm gửi packet — cho phép query history
+  // { battery?: number, batteryVoltage?: number, gsmSignal?: number }
+  state        Json?
+  rawPayload   Json?    @map("raw_payload")
+  geom         Unsupported("geography(Point,4326)")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  events Event[]
+  geofenceStates GeofenceState[]
+
+  @@index([tenantId, deviceTime], map: "idx_pt_positions_tenant_time")
+  @@index([deviceId, deviceTime], map: "idx_pt_positions_device_time")
+  @@index([deviceTime], type: Brin, map: "idx_pt_positions_time_brin")
+  // @@index([geom], type: Gist, map: "idx_pt_positions_geom_gist")
+  @@map("pt_positions")
+}

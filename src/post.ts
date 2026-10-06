@@ -53,11 +53,11 @@ export async function runUpgradeLatest(
   } catch {
     console.warn(
       pc.yellow(
-        `\n⚠️  Nâng cấp dependencies lên bản mới nhất thất bại (có thể do conflict phiên bản hoặc peer dependency).`,
+        '\n⚠️  Dependency upgrade failed (possibly due to version or peer dependency conflicts).',
       ),
     );
     console.warn(
-      pc.yellow(`⚠️  Đang tự động khôi phục lại các phiên bản ổn định đã được kiểm thử từ template...\n`),
+      pc.yellow('⚠️  Restoring template dependency versions and retrying installation...\n'),
     );
 
     // Restore package.json
@@ -67,7 +67,7 @@ export async function runUpgradeLatest(
     try {
       await runInstall(targetDir, pm);
     } catch (installErr) {
-      console.error(pc.red(`❌ Khôi phục và cài đặt template dependencies thất bại:`), installErr);
+      console.error(pc.red('❌ Failed to restore and install template dependencies:'), installErr);
     }
 
     return { success: false, fallbackOccurred: true };
@@ -77,8 +77,8 @@ export async function runUpgradeLatest(
 export function printNextSteps(config: ResolvedConfig): void {
   const { isCurrentDir, displayTargetDir, packageManager, install, projectType } = config;
 
-  console.log(pc.green(`\n✔ Khởi tạo dự án thành công tại `) + pc.cyan(config.targetDir));
-  console.log(pc.bold('\n👉 Các bước tiếp theo (Next steps):'));
+  console.log(pc.green('\n✔ Project created at ') + pc.cyan(config.targetDir));
+  console.log(pc.bold('\n👉 Next steps:'));
 
   const steps: string[] = [];
 
@@ -91,19 +91,19 @@ export function printNextSteps(config: ResolvedConfig): void {
   }
 
   if (projectType === 'fe') {
-    steps.push(`${getRunScriptCommand(packageManager, 'dev')}         # Khởi động Next.js dev server`);
-    steps.push(`${getRunScriptCommand(packageManager, 'test')}        # Chạy Vitest unit tests`);
-    steps.push(`${getRunScriptCommand(packageManager, 'test:e2e')}    # Chạy Playwright E2E tests`);
+    steps.push(`${getRunScriptCommand(packageManager, 'dev')}         # Start the Next.js development server`);
+    steps.push(`${getRunScriptCommand(packageManager, 'test')}        # Run Vitest unit tests`);
+    steps.push(`${getRunScriptCommand(packageManager, 'test:e2e')}    # Run Playwright E2E tests`);
   } else {
-    steps.push(`docker-compose up -d                  # Khởi động TimescaleDB & Redis`);
-    steps.push(`${getRunScriptCommand(packageManager, 'prisma:generate')}  # Sinh Prisma client`);
-    steps.push(`${getRunScriptCommand(packageManager, 'dev:api')}         # Khởi động NestJS REST API dev`);
-    steps.push(`${getRunScriptCommand(packageManager, 'test')}            # Chạy Jest unit tests`);
+    steps.push('docker-compose up -d                  # Start TimescaleDB and Redis');
+    steps.push(`${getRunScriptCommand(packageManager, 'prisma:generate')}  # Generate the Prisma client`);
+    steps.push(`${getRunScriptCommand(packageManager, 'dev:api')}         # Start the NestJS REST API in development mode`);
+    steps.push(`${getRunScriptCommand(packageManager, 'test')}            # Run Jest unit tests`);
   }
 
   steps.forEach((step, idx) => {
     console.log(`  ${pc.gray(`${idx + 1}.`)} ${pc.cyan(step)}`);
   });
 
-  console.log(pc.dim('\nChúc bạn code vui vẻ! 🚀\n'));
+  console.log(pc.dim('\nHappy coding! 🚀\n'));
 }

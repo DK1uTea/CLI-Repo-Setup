@@ -18,7 +18,7 @@ import {
 
 function handleCancel(value: unknown): void {
   if (p.isCancel(value)) {
-    p.cancel('Thao tác đã bị hủy bởi người dùng.');
+    p.cancel('Operation cancelled by the user.');
     process.exit(1);
   }
 }
@@ -37,7 +37,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     projectType = 'fe';
   } else {
     const typePrompt = await p.select({
-      message: 'Chọn loại dự án cần tạo:',
+      message: 'Select a project type:',
       options: [
         { label: 'Frontend (Next.js 16 + React 19 + Tailwind v4 + AI Rules)', value: 'fe' },
         { label: 'Backend (NestJS 11 Monorepo + Prisma 7 + PostgreSQL + TimescaleDB)', value: 'be' },
@@ -53,7 +53,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
   if (projectName) {
     const validation = validateProjectName(projectName);
     if (!validation.valid) {
-      console.warn(pc.yellow(`⚠️  Tên project được truyền vào "${projectName}" không hợp lệ: ${validation.message}`));
+      console.warn(pc.yellow(`⚠️  Invalid project name "${projectName}": ${validation.message}`));
       projectName = undefined;
     }
   }
@@ -64,7 +64,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     } else {
       const defaultName = projectType === 'fe' ? 'my-dashboard' : 'my-backend-api';
       const namePrompt = await p.text({
-        message: 'Nhập tên project (hỗ trợ scope @org/name):',
+        message: 'Enter a project name (supports @org/name):',
         placeholder: defaultName,
         defaultValue: defaultName,
         validate(val) {
@@ -88,7 +88,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     } else {
       const defaultDir = `./${sanitizedProjectName}`;
       const dirPrompt = await p.text({
-        message: 'Nhập thư mục đích (hỗ trợ "." cho thư mục hiện tại):',
+        message: 'Enter a destination directory (use "." for the current directory):',
         placeholder: defaultDir,
         defaultValue: defaultDir,
       });
@@ -111,22 +111,22 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     if (flags.overwrite) {
       existingDirAction = 'overwrite';
     } else if (isYes) {
-      p.cancel(`Thư mục "${targetDir}" không rỗng. Để ghi đè tự động, vui lòng dùng cờ --overwrite.`);
+      p.cancel(`Directory "${targetDir}" is not empty. Use --overwrite to replace its contents in noninteractive mode.`);
       process.exit(1);
     } else {
       const conflictAction = await p.select({
-        message: `Thư mục "${targetDir}" đã tồn tại và không rỗng. Bạn muốn xử lý thế nào?`,
+        message: `Directory "${targetDir}" is not empty. How would you like to proceed?`,
         options: [
-          { label: 'Cancel (Hủy thao tác - Mặc định)', value: 'cancel' },
-          { label: 'Overwrite (Xóa sạch toàn bộ nội dung cũ)', value: 'overwrite' },
-          { label: 'Merge (Ghi đè lên các file trùng lặp)', value: 'merge' },
+          { label: 'Cancel (default)', value: 'cancel' },
+          { label: 'Overwrite (delete all existing contents)', value: 'overwrite' },
+          { label: 'Merge (overwrite matching files)', value: 'merge' },
         ],
         initialValue: 'cancel',
       });
       handleCancel(conflictAction);
 
       if (conflictAction === 'cancel') {
-        p.cancel('Thao tác đã bị hủy.');
+        p.cancel('Operation cancelled.');
         process.exit(0);
       }
       existingDirAction = conflictAction as ExistingDirAction;
@@ -143,7 +143,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     packageManager = detectedPm;
   } else {
     const pmPrompt = await p.select({
-      message: 'Chọn Package Manager:',
+      message: 'Select a package manager:',
       options: [
         { label: `pnpm ${detectedPm === 'pnpm' ? '(auto-detected)' : ''}`, value: 'pnpm' },
         { label: `npm ${detectedPm === 'npm' ? '(auto-detected)' : ''}`, value: 'npm' },
@@ -164,7 +164,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     git = true;
   } else {
     const gitPrompt = await p.confirm({
-      message: 'Khởi tạo Git repository (git init)?',
+      message: 'Initialize a Git repository (git init)?',
       initialValue: true,
     });
     handleCancel(gitPrompt);
@@ -179,7 +179,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     install = true;
   } else {
     const installPrompt = await p.confirm({
-      message: `Cài đặt dependencies bằng ${packageManager} ngay bây giờ?`,
+      message: `Install dependencies with ${packageManager} now?`,
       initialValue: true,
     });
     handleCancel(installPrompt);
@@ -196,7 +196,7 @@ export async function resolveConfig(cliArgs: CliArgs): Promise<ResolvedConfig> {
     latest = true;
   } else {
     const latestPrompt = await p.confirm({
-      message: 'Nâng cấp dependencies lên bản mới nhất (có fallback an toàn)?',
+      message: 'Upgrade dependencies to their latest versions (with fallback on failure)?',
       initialValue: true,
     });
     handleCancel(latestPrompt);

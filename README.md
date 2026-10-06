@@ -1,114 +1,162 @@
 # create-my-stack
 
-CLI scaffolding viết bằng **TypeScript** để khởi tạo nhanh các dự án **Frontend** (Next.js 16 + React 19 + Tailwind v4) hoặc **Backend** (NestJS 11 Monorepo + Prisma 7 + TimescaleDB/PostgreSQL + Redis) từ 2 bộ template chuẩn hóa, tích hợp sẵn hệ thống **AI Rules** (AGENTS.md, CLAUDE.md, skills) và hạ tầng kiểm thử (Vitest, Jest, Playwright).
+`create-my-stack` is a TypeScript CLI that creates a new frontend or backend project from the templates stored in this repository. The frontend template uses Next.js 16, React 19, and Tailwind CSS 4. The backend template uses a NestJS 11 monorepo with Prisma 7, PostgreSQL/TimescaleDB, and Redis.
 
----
+This repository has three distinct parts: the CLI in `src/`, the source templates in `templates/`, and tests for the CLI in `tests/`. The repository root is **not** a runnable frontend or backend application. Template applications are copied into a new directory when the CLI runs.
 
-## 🚀 Cách chạy Local
+## Documentation map
 
-### Cách 1: Chạy trực tiếp qua Node
+| Document | Purpose |
+| --- | --- |
+| [Architecture](docs/architecture.md) | CLI modules, data flow, naming and placeholder rules, directory conflict handling, and post-scaffold operations |
+| [Template maintenance](docs/template-maintenance.md) | How templates are prepared, why editor diagnostics are suppressed in source templates, and how generated projects are verified |
+| [AI agent entry point](AGENTS.md) | Where agents should start when working in this repository |
+| [Repository skill](.agents/skills/create-my-stack-maintenance/SKILL.md) | Task-specific context for agents editing the CLI or templates |
+| [Frontend template README](templates/fe/README.md) | Notes shipped with generated frontend projects |
+| [Backend template README](templates/be/README.md) | Notes shipped with generated backend projects |
 
-Sau khi build dự án:
+## Requirements
+
+- Node.js 20 or newer.
+- pnpm for developing and testing this repository. Generated projects can be installed with pnpm, npm, yarn, or Bun through the CLI's `--pm` option.
+- Git only when using the Git initialization option.
+- Docker and a compatible database/Redis environment when running the generated backend with its included infrastructure.
+
+The root `pnpm-lock.yaml` belongs to the CLI. Dependencies for `templates/fe` and `templates/be` are deliberately absent from the root installation. The templates contain their own `package.json` files; their dependencies are installed after scaffolding.
+
+## Quick start
+
+Install and build the CLI:
+
 ```bash
-# 1. Cài đặt dependencies và build CLI
 pnpm install
 pnpm build
-
-# 2. Chạy trực tiếp
-node dist/index.js
-# hoặc truyền flags
-node dist/index.js my-app --type fe --dir ./my-app --pm pnpm
 ```
 
-### Cách 2: Link toàn cục bằng `pnpm link`
+Create a frontend project without prompts, dependency installation, Git operations, or dependency upgrades:
 
 ```bash
-# Đăng ký link global
-pnpm link --global
-
-# Chạy ở bất kỳ thư mục nào trên máy
-create-my-stack
-# hoặc
-create-my-stack my-app --type fe
+node dist/index.js demo-web --type fe --dir ./demo-web --pm pnpm --no-install --no-git --no-latest --yes
+cd demo-web
+pnpm install
+pnpm dev
 ```
 
-*(Để hủy link sau này: `pnpm unlink --global create-my-stack`)*
+For interactive setup, run `node dist/index.js` with no arguments. You can also run `pnpm link --global` after building to expose the `create-my-stack` command on your machine.
 
----
-
-## 📋 Danh sách Tham số & Flags
-
-CLI hỗ trợ cả hai chế độ: **Interactive (hỏi đáp trực quan bằng `@clack/prompts`)** và **Non-interactive (flags qua `cac`)**.
+Create a backend project with the same predictable, offline scaffold step:
 
 ```bash
+node dist/index.js core-api --type be --dir ./core-api --pm pnpm --no-install --no-git --no-latest --yes
+cd core-api
+pnpm install
+```
+
+To run the backend, configure `.env` from `.env.example`, start the database and Redis services described by the generated project, run Prisma generation/migrations as needed, and then run `pnpm dev:api`. See the backend template README for the project-specific steps.
+
+## Command line interface
+
+```text
 create-my-stack [project-name] [options]
 ```
 
-| Flag | Mô tả | Mặc định |
-|---|---|---|
-| `[project-name]` | Tên project (hỗ trợ scope `@org/name`, validate theo npm standard) | Prompt nếu thiếu |
-| `--type <fe\|be>` | Loại dự án: `fe` (Frontend Next.js) hoặc `be` (Backend NestJS) | Prompt nếu thiếu |
-| `--dir <path>` | Đường dẫn thư mục đích (hỗ trợ `.`, relative, absolute) | `./<project-name>` |
-| `--pm <pm>` | Package manager: `pnpm`, `npm`, `yarn`, `bun` | Auto-detect từ user agent |
-| `--git` / `--no-git` | Có khởi tạo Git repository và commit ban đầu hay không | `true` (Prompt nếu thiếu) |
-| `--install` / `--no-install` | Có tự động chạy `install dependencies` sau khi scaffold hay không | `true` (Prompt nếu thiếu) |
-| `--latest` / `--no-latest` | Có nâng cấp toàn bộ dependencies lên bản mới nhất hay không | `true` (Prompt nếu thiếu) |
-| `--overwrite` | Tự động xóa sạch nội dung cũ nếu thư mục đích tồn tại và không rỗng | Prompt `Cancel/Overwrite/Merge` |
-| `-y`, `--yes` | Sử dụng toàn bộ giá trị mặc định, không hiện prompt | `false` |
-| `-h`, `--help` | Hiển thị bảng trợ giúp | |
-| `-v`, `--version` | Hiển thị phiên bản CLI hiện tại | |
+| Argument or option | Behavior |
+| --- | --- |
+| `project-name` | npm-style package name. A scope such as `@team/service` is accepted. If omitted, the CLI prompts or chooses a default under `--yes`. |
+| `--type fe\|be` | Selects the frontend or backend template. Interactive mode prompts when omitted; `--yes` defaults to `fe`. |
+| `--dir <path>` | Destination directory. Supports `.`, relative paths, and absolute paths. Defaults to `./<sanitized-project-name>`. |
+| `--pm pnpm\|npm\|yarn\|bun` | Package manager for install, upgrade, and printed next steps. When omitted, the CLI detects the invoking package manager and falls back to pnpm. |
+| `--git` / `--no-git` | Enables or skips `git init` and an initial commit attempt. |
+| `--install` / `--no-install` | Enables or skips installation of the generated project's dependencies. |
+| `--latest` / `--no-latest` | Enables or skips dependency upgrade after installation. An upgrade failure restores the original `package.json` and retries installation. |
+| `--overwrite` | Clears a nonempty destination directory before copying the template. This is destructive. |
+| `-y`, `--yes` | Suppresses prompts and fills omitted choices with defaults. With `--yes`, Git, installation, and upgrade default to enabled. |
+| `-h`, `--help` | Prints CLI help. |
+| `-v`, `--version` | Prints the CLI version. |
 
-### Ví dụ lệnh không tương tác (CI / Automation):
+In interactive mode, a nonempty destination offers **cancel**, **overwrite**, or **merge**. Merge overwrites matching files while retaining unrelated existing files. In noninteractive mode, a nonempty destination is rejected unless `--overwrite` is passed. A `--latest` request is effective only when installation is enabled.
 
-```bash
-# Tạo dự án Frontend nhanh, không prompt, không cài deps, không git
-create-my-stack dashboard --type fe --pm pnpm --no-install --no-git --yes
+For repeatable CI or local examples, explicitly pass `--no-install --no-git --no-latest --yes`. Omitting these flags under `--yes` performs additional operations and may require network access.
 
-# Tạo dự án Backend vào thư mục hiện tại và ghi đè nếu có file cũ
-create-my-stack core-api --type be --dir . --pm pnpm --overwrite --yes
+## What the CLI creates
+
+The CLI copies one complete template, renames `_gitignore` and `_npmrc` to their dotfile names, and skips dependency/build directories. For the backend, it renames `apps/__projectName__` to the sanitized project name. It replaces these placeholders in text files:
+
+| Placeholder | Meaning |
+| --- | --- |
+| `{{projectName}}` | Original package name, including a scope if supplied. Docker/YAML replacements use the sanitized name where required. |
+| `{{sanitizedProjectName}}` | Filesystem-safe application name derived from the final segment of the package name. |
+| `{{projectNameTitle}}` | Human-readable title derived from the package name. |
+| `{{projectNameDb}}` | Lowercase database name with scope/path punctuation replaced by underscores. |
+
+Binary files are skipped during placeholder processing. The source templates have an editor-only `noCheck` TypeScript option because their dependencies are not installed here. The CLI removes that option in every generated project and restores the backend's `multer` type dependency. Generated projects therefore retain normal TypeScript checking.
+
+After file generation, the CLI optionally initializes Git, installs dependencies, and upgrades them. These actions are independent choices except that upgrading requires installation. The resulting project contains the template's own scripts, tests, documentation, and configuration.
+
+## Repository layout
+
+```text
+src/
+  index.ts          CLI entry point and operation order
+  cli.ts            Flag parsing and help/version handling
+  prompts.ts        Interactive prompts and default resolution
+  validate.ts       Name validation and destination resolution
+  scaffold.ts       Copy, rename, placeholder traversal, cleanup on failure
+  placeholders.ts   Placeholder values and binary/text handling
+  pm.ts             Package manager command selection
+  post.ts           Git, installation, upgrade fallback, next steps
+  types.ts          Shared CLI types
+templates/
+  fe/               Next.js application template
+  be/               NestJS monorepo template
+  tests/
+    src/             Unit tests mirroring paths under src/
+    scripts/         Unit tests mirroring safe, importable helpers under scripts/
+    e2e.test.ts      Quick CLI end-to-end tests
+    e2e-full.test.ts Optional install/build verification
+scripts/
+  prepare-templates.mjs   Destructive import/cleanup from local source repositories
+  template-source-filter.mjs   Importable filter for excluded source files
+docs/               Architecture and maintenance documentation
+.agents/skills/     Repository-specific AI skill
 ```
 
----
+The package publishes `dist/` and `templates/` through the `files` field in the root `package.json`. The root documentation and repository skill are for maintainers of this source repository; they are not copied into generated projects. Template-local AI instructions, such as `templates/fe/AGENTS.md`, belong to the generated application.
 
-## 🛡️ Cơ chế Fallback khi chọn `--latest`
+Unit tests mirror the source tree under `tests/`: `src/pm.ts` maps to `tests/src/pm.test.ts`, and importable helpers under `scripts/` map to `tests/scripts/`. CLI end-to-end tests stay at `tests/e2e*.test.ts`. The applications inside `templates/` have their own test suites; those tests are copied into generated projects and are not part of the root CLI unit-test layout.
 
-- Khi bật tùy chọn nâng cấp dependencies lên bản mới nhất (`--latest`), CLI sẽ chạy lệnh cập nhật tương ứng với Package Manager đã chọn (`pnpm up --latest`, `npm-check-updates -u && npm install`, `yarn up`, `bun update`).
-- **An toàn**: CLI tự động tạo bản sao lưu của `package.json` trước khi nâng cấp. Nếu có xung đột phiên bản (breaking changes / peer dependency conflict) khiến lệnh nâng cấp thất bại:
-  1. CLI tự động khôi phục lại `package.json` gốc từ template.
-  2. Tự động chạy lại lệnh `install` tiêu chuẩn.
-  3. In cảnh báo rõ ràng và tiếp tục hoàn tất quá trình khởi tạo dự án mà không làm gián đoạn hay hỏng project.
+For new CLI behavior and bug fixes, use test-driven development: write a focused test for the expected result, confirm the test fails for the right reason, implement the smallest change, and refactor with the test passing. Existing-behavior coverage can pass on its first run because it documents what the CLI already does. See [AGENTS.md](AGENTS.md) for the maintainer workflow. The FE template has its own TDD instructions for its generated application.
 
----
+## Development commands
 
-## 🔄 Cách cập nhật Template khi 2 Repo gốc thay đổi
+Run these from the repository root:
 
-Khi repo gốc Frontend (`D:\Bavaan\mep-dashboard-fe`) hoặc Backend (`D:\Bavaan\protrack-backend-api`) có cập nhật kiến trúc hoặc tính năng mới, bạn có thể đồng bộ lại các template trong thư mục `templates/` thông qua script tự động:
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Rebuilds the CLI with tsup when source changes. |
+| `pnpm build` | Produces the ESM CLI in `dist/index.js`. |
+| `pnpm typecheck` | Checks `src/` with TypeScript. The root `tsconfig.json` excludes templates and tests. |
+| `pnpm lint` | Runs ESLint over `src/` and `tests/`. |
+| `pnpm test` | Runs the normal Vitest suite, excluding the full install/build suite. |
+| `pnpm test:e2e` | Runs the quick CLI end-to-end test file. |
+| `pnpm test:full` | Runs the optional full install/build suite. This script uses POSIX environment-variable syntax; on PowerShell set `$env:E2E_FULL='1'` and run `pnpm exec vitest run tests/e2e-full.test.ts`. |
+| `pnpm format` | Formats the root CLI source and tests with Prettier. |
 
-```bash
-node scripts/prepare-templates.mjs
-```
+The full suite installs both generated projects, builds the frontend, and generates the Prisma client before building the backend. It needs network access and considerably more time than `pnpm test`. It does not start the backend's database services.
 
-Script này tự động:
-1. Đọc và lọc sạch toàn bộ: `node_modules`, `.git`, `.next`, `dist`, `.env` thật (chỉ giữ `.env.example`), logs, cache cá nhân (`.omc`, `.playwright-mcp`), build info (`*.tsbuildinfo`).
-2. Tự động đổi tên `.gitignore` thành `_gitignore` (tránh lỗi đóng gói npm).
-3. Đặt lại các biến placeholder `{{projectName}}`, `{{sanitizedProjectName}}`, `{{projectNameTitle}}`, `{{projectNameDb}}` vào `package.json`, `nest-cli.json`, `docker-compose.yml`, Swagger, README.
-4. Đổi tên thư mục app chính trong Monorepo BE thành `apps/__projectName__`.
+## Editing templates and IDE diagnostics
 
-Sau khi cập nhật template, chạy lại build và test:
-```bash
-pnpm build
-pnpm test
-```
+The files in `templates/` are source artifacts with unresolved placeholders and no local `node_modules`. Opening them in a TypeScript editor used to produce missing-package and follow-on type errors. Broad `declare module '*'` shims also removed useful type information. The current source templates use `noCheck` to keep TS/TSX language recognition while suppressing semantic checking before dependencies exist. The generated projects do **not** inherit `noCheck`.
 
----
+For a real template type check, scaffold into a separate directory, install its dependencies, and run the generated project's `typecheck` (frontend) or `build` (backend) command. Restart the TypeScript server in VS Code if an already-open tab continues to show stale diagnostics after changing template configuration. See [Template maintenance](docs/template-maintenance.md) before modifying the import script or source templates.
 
-## 🧪 Các script phát triển & Kiểm thử
+## AI-assisted maintenance
 
-- `pnpm dev`: Chạy tsup watcher để live-rebuild mã nguồn CLI khi code.
-- `pnpm build`: Build bundle ESM bằng tsup ra `dist/index.js`.
-- `pnpm typecheck`: Kiểm tra TypeScript strict type.
-- `pnpm lint`: Chạy ESLint kiểm tra quy chuẩn mã nguồn.
-- `pnpm format`: Chạy Prettier định dạng code.
-- `pnpm test`: Chạy toàn bộ Unit test và E2E test nhanh (Vitest).
-- `pnpm test:e2e`: Chạy riêng bộ E2E test.
-- `pnpm test:full`: Chạy bộ E2E test chuyên sâu (scaffold thật, `pnpm install` và `pnpm build` cả 2 repo mẫu).
+Agents working on this repository should read [AGENTS.md](AGENTS.md), then use the [repository skill](.agents/skills/create-my-stack-maintenance/SKILL.md) for changes to the CLI, scaffold flow, or template preparation. The skill points to the relevant source of truth and calls out invariants that are easy to break, especially the distinction between source templates and generated projects. When working inside `templates/fe`, follow its own `AGENTS.md` as well.
+
+## Current limitations
+
+- `scripts/prepare-templates.mjs` has two hardcoded local Windows source paths. It is a maintainer tool and cannot run on another machine until those paths are adjusted.
+- Source template `noCheck` is an editor convenience. It is not evidence that a freshly generated project passes its own type check or build.
+- Dependency upgrades can change project behavior. Use `--no-latest` for reproducible scaffolding and validate a project after choosing an upgrade.
+- The initial Git commit may fail when the user's Git identity is not configured; Git initialization can still succeed.

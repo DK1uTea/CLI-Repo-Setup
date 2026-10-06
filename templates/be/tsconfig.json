@@ -13,16 +13,16 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "noCheck": true,
     "paths": {
-      "@app/core": ["libs/core/src"],
-      "@app/core/*": ["libs/core/src/*"],
-      "@app/layer-data": ["libs/layer-data/src"],
-      "@app/layer-data/*": ["libs/layer-data/src/*"],
-      "@app/third-party": ["libs/third-party/src"],
-      "@app/third-party/*": ["libs/third-party/src/*"],
-      "@libs/*": ["src/shared/libs/*"],
-      "@shared/*": ["src/shared/*"]
+      "@app/core": ["./libs/core/src"],
+      "@app/core/*": ["./libs/core/src/*"],
+      "@app/layer-data": ["./libs/layer-data/src"],
+      "@app/layer-data/*": ["./libs/layer-data/src/*"],
+      "@app/third-party": ["./libs/third-party/src"],
+      "@app/third-party/*": ["./libs/third-party/src/*"],
+      "@libs/*": ["./src/shared/libs/*"],
+      "@shared/*": ["./src/shared/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
@@ -31,6 +31,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["multer"]
+    "types": []
   }
 }

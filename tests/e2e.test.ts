@@ -17,6 +17,15 @@ describe('E2E CLI execution', () => {
     await fs.remove(tmpRoot);
   });
 
+  it('shows English descriptions in CLI help', async () => {
+    const result = await execa('node', [CLI_ENTRY, '--help'], { cwd: tmpRoot });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Project name to create');
+    expect(result.stdout).toContain('Install dependencies after scaffolding');
+    expect(result.stdout).toContain('Use defaults without prompts');
+  });
+
   it('scaffolds Frontend project non-interactively with --yes', async () => {
     const targetDir = path.join(tmpRoot, 'my-frontend-app');
 

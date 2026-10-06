@@ -89,6 +89,18 @@ export async function copyTemplateFiles(srcDir: string, destDir: string): Promis
   if (await fs.pathExists(npmrc)) {
     await fs.move(npmrc, path.join(destDir, '.npmrc'), { overwrite: true });
   }
+
+  // Templates are inspected without their own dependencies in this repository.
+  // Restore full type checking in every generated project.
+  const tsconfigPath = path.join(destDir, 'tsconfig.json');
+  if (await fs.pathExists(tsconfigPath)) {
+    const tsconfig = await fs.readJson(tsconfigPath);
+    delete tsconfig.compilerOptions.noCheck;
+    if (path.basename(srcDir) === 'be') {
+      tsconfig.compilerOptions.types = ['multer'];
+    }
+    await fs.writeJson(tsconfigPath, tsconfig, { spaces: 2 });
+  }
 }
 
 export async function replaceAllPlaceholders(

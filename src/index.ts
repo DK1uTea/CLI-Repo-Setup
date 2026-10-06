@@ -13,7 +13,7 @@ async function main() {
   const spinner = p.spinner();
 
   try {
-    spinner.start(`Đang thiết lập dự án ${pc.cyan(config.projectName)} (${config.projectType.toUpperCase()})...`);
+    spinner.start(`Setting up ${pc.cyan(config.projectName)} (${config.projectType.toUpperCase()})...`);
 
     await scaffoldProject({
       projectType: config.projectType,
@@ -23,40 +23,40 @@ async function main() {
       existingDirAction: config.existingDirAction,
     });
 
-    spinner.stop(pc.green(`✔ Đã tạo template thành công tại `) + pc.cyan(config.targetDir));
+    spinner.stop(pc.green('✔ Template created at ') + pc.cyan(config.targetDir));
 
     // Git Init
     if (config.git) {
-      spinner.start('Đang khởi tạo Git repository...');
+      spinner.start('Initializing Git repository...');
       const gitRes = await initGit(config.targetDir);
       if (gitRes.success) {
-        spinner.stop(pc.green('✔ Đã khởi tạo Git repository và tạo initial commit'));
+        spinner.stop(pc.green('✔ Git repository initialized'));
       } else {
-        spinner.stop(pc.yellow('⚠️  Không thể khởi tạo Git repository (vui lòng chạy "git init" thủ công)'));
+        spinner.stop(pc.yellow('⚠️  Could not initialize Git repository (run "git init" manually)'));
       }
     }
 
     // Install Dependencies
     if (config.install) {
-      console.log(pc.cyan(`\n📦 Đang cài đặt dependencies bằng ${config.packageManager}...`));
+      console.log(pc.cyan(`\n📦 Installing dependencies with ${config.packageManager}...`));
       await runInstall(config.targetDir, config.packageManager);
-      console.log(pc.green(`✔ Đã cài đặt dependencies thành công!\n`));
+      console.log(pc.green('✔ Dependencies installed successfully!\n'));
 
       // Latest Upgrade
       if (config.latest) {
-        console.log(pc.cyan(`🚀 Đang nâng cấp dependencies lên bản mới nhất...`));
+        console.log(pc.cyan('🚀 Upgrading dependencies to their latest versions...'));
         const upgradeRes = await runUpgradeLatest(config.targetDir, config.packageManager);
         if (upgradeRes.success) {
-          console.log(pc.green(`✔ Nâng cấp dependencies lên latest thành công!\n`));
+          console.log(pc.green('✔ Dependencies upgraded successfully!\n'));
         }
       }
     }
 
     printNextSteps(config);
-    p.outro(pc.green('Khởi tạo dự án hoàn tất!'));
+    p.outro(pc.green('Project setup complete!'));
   } catch (error) {
-    spinner.stop(pc.red('✖ Thao tác thất bại'));
-    console.error(pc.red('\nĐã xảy ra lỗi trong quá trình khởi tạo:'));
+    spinner.stop(pc.red('✖ Operation failed'));
+    console.error(pc.red('\nAn error occurred during project setup:'));
     if (error instanceof Error) {
       console.error(pc.red(error.message));
     } else {

@@ -49,32 +49,32 @@ const NPM_NAME_REGEX = /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]
 
 export function validateProjectName(name: string): { valid: boolean; message?: string } {
   if (!name || name.trim().length === 0) {
-    return { valid: false, message: 'Tên project không được để trống.' };
+    return { valid: false, message: 'Project name cannot be empty.' };
   }
 
   const trimmed = name.trim();
   if (trimmed !== name) {
-    return { valid: false, message: 'Tên project không được chứa khoảng trắng ở đầu hoặc cuối.' };
+    return { valid: false, message: 'Project name cannot have leading or trailing whitespace.' };
   }
 
   if (name.length > 214) {
-    return { valid: false, message: 'Tên project không được vượt quá 214 ký tự.' };
+    return { valid: false, message: 'Project name cannot exceed 214 characters.' };
   }
 
   if (name !== name.toLowerCase()) {
-    return { valid: false, message: 'Tên project phải viết thường hoàn toàn (lowercase).' };
+    return { valid: false, message: 'Project name must be lowercase.' };
   }
 
   if (name.startsWith('.') || name.startsWith('_')) {
-    return { valid: false, message: 'Tên project không được bắt đầu bằng dấu chấm hoặc gạch dưới.' };
+    return { valid: false, message: 'Project name cannot start with a dot or underscore.' };
   }
 
   if (RESERVED_NAMES.has(name)) {
-    return { valid: false, message: `"${name}" là từ khóa hệ thống hoặc tên module Node.js đã được bảo lưu.` };
+    return { valid: false, message: `"${name}" is a reserved system or Node.js module name.` };
   }
 
   if (!NPM_NAME_REGEX.test(name)) {
-    return { valid: false, message: 'Tên project không đúng định dạng npm package name (chỉ gồm a-z, 0-9, dấu gạch nối, hoặc @scope/name).' };
+    return { valid: false, message: 'Project name must be a valid npm package name (lowercase letters, numbers, hyphens, or @scope/name).' };
   }
 
   return { valid: true };

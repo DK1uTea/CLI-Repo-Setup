@@ -5,18 +5,18 @@ export function parseCliArgs(argv = process.argv): CliArgs {
   const cli = cac('create-my-stack');
 
   cli
-    .command('[project-name]', 'Tên project cần khởi tạo')
-    .option('--type <type>', 'Loại project (fe: Frontend Next.js, be: Backend NestJS)')
-    .option('--dir <path>', 'Thư mục đích')
+    .command('[project-name]', 'Project name to create')
+    .option('--type <type>', 'Project type (fe: Next.js frontend, be: NestJS backend)')
+    .option('--dir <path>', 'Destination directory')
     .option('--pm <package-manager>', 'Package manager (pnpm, npm, yarn, bun)')
-    .option('--git', 'Khởi tạo Git repository')
-    .option('--no-git', 'Không khởi tạo Git')
-    .option('--install', 'Cài đặt dependencies sau khi tạo')
-    .option('--no-install', 'Không cài đặt dependencies')
-    .option('--latest', 'Nâng cấp dependencies lên bản mới nhất')
-    .option('--no-latest', 'Giữ nguyên phiên bản trong template')
-    .option('--overwrite', 'Tự động ghi đè nếu thư mục đích không rỗng')
-    .option('-y, --yes', 'Dùng toàn bộ giá trị mặc định, không hiện prompt');
+    .option('--git', 'Initialize a Git repository')
+    .option('--no-git', 'Skip Git initialization')
+    .option('--install', 'Install dependencies after scaffolding')
+    .option('--no-install', 'Skip dependency installation')
+    .option('--latest', 'Upgrade dependencies to their latest versions')
+    .option('--no-latest', 'Keep dependency versions from the template')
+    .option('--overwrite', 'Overwrite a nonempty destination directory')
+    .option('-y, --yes', 'Use defaults without prompts');
 
   cli.help();
   cli.version('0.1.0');

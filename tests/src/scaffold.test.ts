@@ -7,7 +7,7 @@ import {
   isDirectoryEmpty,
   prepareTargetDirectory,
   scaffoldProject,
-} from '../src/scaffold.js';
+} from '../../src/scaffold.js';
 
 describe('scaffold helpers and operations', () => {
   let tmpDir: string;
@@ -52,6 +52,25 @@ describe('scaffold helpers and operations', () => {
     expect(await fs.readFile(path.join(mockDest, '.gitignore'), 'utf8')).toBe('node_modules\n');
   });
 
+  it('restores _npmrc and excludes source-only directories and shims', async () => {
+    const source = path.join(tmpDir, 'source');
+    const destination = path.join(tmpDir, 'destination');
+    await fs.ensureDir(path.join(source, 'node_modules'));
+    await fs.ensureDir(path.join(source, 'dist'));
+    await fs.writeFile(path.join(source, '_npmrc'), 'strict-peer-dependencies=false\n');
+    await fs.writeFile(path.join(source, 'node_modules', 'old.js'), 'old');
+    await fs.writeFile(path.join(source, 'dist', 'old.js'), 'old');
+    await fs.writeFile(path.join(source, 'template-shims.d.ts'), "declare module '*';");
+
+    await copyTemplateFiles(source, destination);
+
+    expect(await fs.readFile(path.join(destination, '.npmrc'), 'utf8')).toBe('strict-peer-dependencies=false\n');
+    expect(await fs.pathExists(path.join(destination, '_npmrc'))).toBe(false);
+    expect(await fs.pathExists(path.join(destination, 'node_modules'))).toBe(false);
+    expect(await fs.pathExists(path.join(destination, 'dist'))).toBe(false);
+    expect(await fs.pathExists(path.join(destination, 'template-shims.d.ts'))).toBe(false);
+  });
+
   it('scaffolds FE template with placeholders replaced', async () => {
     const target = path.join(tmpDir, 'my-frontend');
     const res = await scaffoldProject({
@@ -69,6 +88,10 @@ describe('scaffold helpers and operations', () => {
 
     const pkg = await fs.readJson(path.join(target, 'package.json'));
     expect(pkg.name).toBe('@myorg/dashboard-app');
+
+    const tsconfig = await fs.readJson(path.join(target, 'tsconfig.json'));
+    expect(tsconfig.compilerOptions).not.toHaveProperty('noCheck');
+    expect(await fs.pathExists(path.join(target, 'src', 'template-shims.d.ts'))).toBe(false);
   });
 
   it('scaffolds BE template with monorepo app folder renamed', async () => {
@@ -92,5 +115,41 @@ describe('scaffold helpers and operations', () => {
     const nestCli = await fs.readJson(path.join(target, 'nest-cli.json'));
     expect(nestCli.root).toBe('apps/core-api');
     expect(nestCli.projects['core-api']).toBeDefined();
+
+    const tsconfig = await fs.readJson(path.join(target, 'tsconfig.json'));
+    expect(tsconfig.compilerOptions).not.toHaveProperty('noCheck');
+    expect(tsconfig.compilerOptions.types).toEqual(['multer']);
+    expect(await fs.pathExists(path.join(target, 'apps', 'core-api', 'src', 'template-shims.d.ts'))).toBe(false);
+  });
+
+  it('preserves unrelated files when merging into an existing directory', async () => {
+    const target = path.join(tmpDir, 'existing');
+    await fs.ensureDir(target);
+    await fs.writeFile(path.join(target, 'custom.txt'), 'keep me');
+
+    const result = await scaffoldProject({
+      projectType: 'fe',
+      projectName: 'merged-app',
+      sanitizedProjectName: 'merged-app',
+      targetDir: target,
+      existingDirAction: 'merge',
+    });
+
+    expect(result.createdNewDir).toBe(false);
+    expect(await fs.readFile(path.join(target, 'custom.txt'), 'utf8')).toBe('keep me');
+    expect((await fs.readJson(path.join(target, 'package.json'))).name).toBe('merged-app');
+  });
+
+  it('removes a newly created destination if the template cannot be found', async () => {
+    const target = path.join(tmpDir, 'failed');
+
+    await expect(scaffoldProject({
+      projectType: 'missing' as 'fe',
+      projectName: 'failed-app',
+      sanitizedProjectName: 'failed-app',
+      targetDir: target,
+    })).rejects.toThrow(/Template directory not found/);
+
+    expect(await fs.pathExists(target)).toBe(false);
   });
 });

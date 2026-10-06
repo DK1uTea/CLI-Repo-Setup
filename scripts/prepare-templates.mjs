@@ -1,56 +1,12 @@
 import fs from 'fs-extra';
 import path from 'node:path';
+import { shouldExclude } from './template-source-filter.mjs';
 
 const ROOT_DIR = process.cwd();
 const FE_SRC = 'D:\\Bavaan\\mep-dashboard-fe';
 const BE_SRC = 'D:\\Bavaan\\protrack-backend-api';
 const FE_DEST = path.join(ROOT_DIR, 'templates', 'fe');
 const BE_DEST = path.join(ROOT_DIR, 'templates', 'be');
-
-const COMMON_EXCLUDES = [
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
-  'out',
-  '.next',
-  '.env',
-  '.env.local',
-  'pnpm-lock.yaml',
-  'package-lock.json',
-  'yarn.lock',
-  'bun.lockb',
-  'coverage',
-  '.DS_Store',
-  'Thumbs.db',
-];
-
-function shouldExclude(srcPath, relPath, isFE) {
-  const parts = relPath.split(/[\\/]/);
-  const base = path.basename(srcPath);
-
-  for (const part of parts) {
-    if (COMMON_EXCLUDES.includes(part)) return true;
-    if (part === '.husky' && parts.includes('_')) return true;
-    if (part === '.omc' && (parts.includes('sessions') || parts.includes('state'))) return true;
-  }
-
-  if (base.endsWith('.tsbuildinfo')) return true;
-  if (base.startsWith('.env.') && base.endsWith('.local')) return true;
-  if (base === '.env') return true;
-
-  if (isFE) {
-    if (parts.includes('.playwright-mcp')) return true;
-    if (parts.includes('.playwright-cli')) return true;
-    if (parts.includes('playwright-report')) return true;
-    if (parts.includes('test-results')) return true;
-    if (parts.includes('src') && parts.includes('.omc')) return true;
-    if (parts.includes('.omc')) return true;
-    if (parts.includes('.vscode') && base !== 'mcp.json') return true;
-  }
-
-  return false;
-}
 
 async function copyRepo(srcDir, destDir, isFE) {
   console.log(`Copying base files from ${srcDir} to ${destDir}...`);
@@ -405,12 +361,11 @@ export function AppSidebar() {
     );
   }
 
-  // Create ambient type shims for clean IDE experience in root workspace
-  await fs.writeFile(
-    path.join(FE_DEST, 'src', 'template-shims.d.ts'),
-    "/**\n * Ambient type shims for template development in root workspace.\n * Prevents IDE from showing 'Cannot find module' errors.\n * Automatically excluded when scaffolding new projects.\n */\ndeclare module '*';\n",
-    'utf8',
-  );
+  // Template tsconfig disables checking until a real project installs dependencies.
+  const feTsconfigPath = path.join(FE_DEST, 'tsconfig.json');
+  const feTsconfig = await fs.readJson(feTsconfigPath);
+  feTsconfig.compilerOptions.noCheck = true;
+  await fs.writeJson(feTsconfigPath, feTsconfig, { spaces: 2 });
 }
 
 async function cleanBE() {
@@ -755,15 +710,20 @@ Template Backend REST API chuẩn doanh nghiệp, xây dựng theo kiến trúc 
     await fs.writeFile(claudeMdPath, claudeMd, 'utf8');
   }
 
-  // Create ambient type shims for clean IDE experience in root workspace
-  const shimContent =
-    "/**\n * Ambient type shims for template development in root workspace.\n * Prevents IDE from showing 'Cannot find module' errors.\n * Automatically excluded when scaffolding new projects.\n */\ndeclare module '*';\n";
-  await fs.writeFile(path.join(BE_DEST, 'template-shims.d.ts'), shimContent, 'utf8');
-  await fs.writeFile(
-    path.join(BE_DEST, 'apps', '__projectName__', 'src', 'template-shims.d.ts'),
-    shimContent,
-    'utf8',
-  );
+  // Keep the source template quiet in editors; scaffold restores runtime types.
+  const beTsconfigPath = path.join(BE_DEST, 'tsconfig.json');
+  const beTsconfig = await fs.readJson(beTsconfigPath);
+  delete beTsconfig.compilerOptions.baseUrl;
+  for (const targets of Object.values(beTsconfig.compilerOptions.paths)) {
+    for (let i = 0; i < targets.length; i++) {
+      if (!targets[i].startsWith('.')) targets[i] = `./${targets[i]}`;
+    }
+  }
+  beTsconfig.compilerOptions.noCheck = true;
+  beTsconfig.compilerOptions.types = [];
+  await fs.writeJson(beTsconfigPath, beTsconfig, { spaces: 2 });
+  await fs.remove(path.join(BE_DEST, 'template-shims.d.ts'));
+  await fs.remove(path.join(BE_DEST, 'apps', '__projectName__', 'src', 'template-shims.d.ts'));
 }
 
 async function main() {

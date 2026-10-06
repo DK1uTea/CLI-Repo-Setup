@@ -4,7 +4,7 @@ import {
   getInstallArgs,
   getRunScriptCommand,
   getUpgradeArgs,
-} from '../src/pm.js';
+} from '../../src/pm.js';
 
 describe('detectPackageManager', () => {
   it('detects pnpm from user agent', () => {

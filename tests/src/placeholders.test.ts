@@ -10,7 +10,7 @@ import {
   replacePlaceholdersInContent,
   toDbName,
   toTitleCase,
-} from '../src/placeholders.js';
+} from '../../src/placeholders.js';
 
 describe('placeholders helper functions', () => {
   it('converts to title case correctly', () => {

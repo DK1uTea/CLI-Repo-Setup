@@ -4,9 +4,14 @@ import {
   getSanitizedProjectName,
   resolveTargetDir,
   validateProjectName,
-} from '../src/validate.js';
+} from '../../src/validate.js';
 
 describe('validateProjectName', () => {
+  it('explains validation errors in English', () => {
+    expect(validateProjectName('').message).toBe('Project name cannot be empty.');
+    expect(validateProjectName('MyApp').message).toBe('Project name must be lowercase.');
+  });
+
   it('accepts standard valid project names', () => {
     expect(validateProjectName('my-app').valid).toBe(true);
     expect(validateProjectName('my-fe-project').valid).toBe(true);

@@ -30,4 +30,6 @@ This repository is a generator. Distinguish the root CLI from the two applicatio
 
 Choose the smallest checks that cover the changed path. For CLI changes, run `pnpm typecheck`, `pnpm lint`, `pnpm build`, and `pnpm test` as relevant. For template/config changes, scaffold FE and BE into disposable directories and inspect the generated output. Use the optional full install/build suite when dependency or generated-app compilation is at issue. Keep `README.md` and the focused docs accurate when behavior changes.
 
+The root commit gate is `pnpm verify:commit`, invoked by `.husky/pre-commit`. It runs lint, typecheck, build, and normal tests; the full generated-project install/build suite is separate. Keep this gate synchronized with package scripts and documentation.
+
 For new CLI behavior or a bug fix, use a red → green → refactor loop: write the expected behavior as a test in the mirrored `tests/src/` or `tests/scripts/` path (or a CLI E2E test if process-level behavior is essential), verify the test fails for the intended reason, implement the minimal fix, then run it and the relevant checks again. For coverage of existing behavior, write characterization tests without changing source just to force a failure. The FE template's separate QA/dev test ownership rules apply inside that template, not automatically to the root CLI.

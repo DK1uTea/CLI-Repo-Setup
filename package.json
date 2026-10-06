@@ -14,10 +14,12 @@
     "node": ">=20"
   },
   "scripts": {
+    "prepare": "husky",
     "dev": "tsup --watch",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ tests/",
+    "lint": "eslint src/ tests/ scripts/",
+    "verify:commit": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "test": "vitest run --exclude 'tests/e2e-full.test.ts'",
     "test:e2e": "vitest run tests/e2e.test.ts",
     "test:full": "E2E_FULL=1 vitest run tests/e2e-full.test.ts",
@@ -44,9 +46,10 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^26.6.3",
     "eslint": "^10.11.0",
+    "husky": "9.1.7",
     "prettier": "^3.9.9",
     "tsup": "^8.5.1",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.1",
     "vitest": "^5.0.2"
   }

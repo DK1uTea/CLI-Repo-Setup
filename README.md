@@ -136,13 +136,20 @@ Run these from the repository root:
 | `pnpm dev` | Rebuilds the CLI with tsup when source changes. |
 | `pnpm build` | Produces the ESM CLI in `dist/index.js`. |
 | `pnpm typecheck` | Checks `src/` with TypeScript. The root `tsconfig.json` excludes templates and tests. |
-| `pnpm lint` | Runs ESLint over `src/` and `tests/`. |
+| `pnpm lint` | Runs ESLint over `src/`, `tests/`, and `scripts/`. |
+| `pnpm verify:commit` | Runs lint, typecheck, build, and the normal test suite in the same order as the pre-commit hook. |
 | `pnpm test` | Runs the normal Vitest suite, excluding the full install/build suite. |
 | `pnpm test:e2e` | Runs the quick CLI end-to-end test file. |
 | `pnpm test:full` | Runs the optional full install/build suite. This script uses POSIX environment-variable syntax; on PowerShell set `$env:E2E_FULL='1'` and run `pnpm exec vitest run tests/e2e-full.test.ts`. |
 | `pnpm format` | Formats the root CLI source and tests with Prettier. |
 
 The full suite installs both generated projects, builds the frontend, and generates the Prisma client before building the backend. It needs network access and considerably more time than `pnpm test`. It does not start the backend's database services.
+
+### Commit gate
+
+The root repository uses Husky. `pnpm install` runs the `prepare` script, which configures Git to use `.husky/_`; run `pnpm run prepare` if you need to activate hooks in an existing checkout. On each commit, `.husky/pre-commit` runs `pnpm verify:commit`. A failing lint, typecheck, build, or normal test command stops the commit.
+
+The root lint command covers `src/`, `tests/`, and `scripts/`. The normal test suite includes the quick CLI E2E tests and excludes `tests/e2e-full.test.ts`, which downloads dependencies and builds both generated applications. Run `pnpm test:full` separately when template dependencies or generated builds change. Root Husky checks do not run the application test suites inside `templates/`; those belong to generated projects.
 
 ## Editing templates and IDE diagnostics
 
